@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,8 +40,6 @@ import com.nailong.world.ui.components.ContentCard
 import com.nailong.world.ui.components.GameCard
 import com.nailong.world.ui.components.LiveChip
 import com.nailong.world.ui.components.SectionHeader
-import com.nailong.world.ui.theme.GradientEnd
-import com.nailong.world.ui.theme.GradientStart
 import com.nailong.world.ui.theme.NailongOrange
 import com.nailong.world.ui.theme.TextSecondary
 import com.nailong.world.viewmodel.HomeViewModel
@@ -225,7 +221,7 @@ private fun LiveRoomCard(
                 onClick = onEnter,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
+                    containerColor = NailongOrange,
                 ),
             ) {
                 Text("進入直播間", fontWeight = FontWeight.Bold)

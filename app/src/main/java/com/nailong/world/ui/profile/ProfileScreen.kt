@@ -25,7 +25,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -120,11 +120,11 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                 ),
             ) {
                 ProfileMenuItem(icon = Icons.Filled.CalendarMonth, title = "我的簽到", subtitle = "連續 3 天")
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                 ProfileMenuItem(icon = Icons.Filled.Star, title = "我的遊戲", subtitle = "收藏的遊戲")
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                 ProfileMenuItem(icon = Icons.Filled.Favorite, title = "我的收藏", subtitle = "藝術館 / 音樂 / 表情")
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                Divider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                 ProfileMenuItem(icon = Icons.Filled.Settings, title = "設定", subtitle = "個人資料與偏好")
             }
         }

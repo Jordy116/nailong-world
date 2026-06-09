@@ -81,8 +81,7 @@ fun Badge(
     }
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(background)
+            .background(background, RoundedCornerShape(4.dp))
             .padding(horizontal = 8.dp, vertical = 2.dp),
     ) {
         Text(
