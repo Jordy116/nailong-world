@@ -74,14 +74,18 @@ fun Badge(
     isGradient: Boolean = true,
     modifier: Modifier = Modifier,
 ) {
-    val background = if (isGradient) {
-        Brush.horizontalGradient(listOf(GradientStart, GradientEnd))
-    } else {
-        Color(0xFFFF4466)
-    }
     Box(
         modifier = modifier
-            .background(background, RoundedCornerShape(4.dp))
+            .then(
+                if (isGradient) {
+                    Modifier.background(
+                        Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
+                        RoundedCornerShape(4.dp),
+                    )
+                } else {
+                    Modifier.background(Color(0xFFFF4466), RoundedCornerShape(4.dp))
+                }
+            )
             .padding(horizontal = 8.dp, vertical = 2.dp),
     ) {
         Text(
