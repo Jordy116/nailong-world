@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary brand colors — vibrant orange/coral inspired by 奶龍 -->
+    <color name="nailong_orange">#FFFF6B35</color>
+    <color name="nailong_coral">#FFFF8C42</color>
+    <color name="nailong_yellow">#FFFFC107</color>
+
+    <!-- Background -->
+    <color name="background_light">#FFFFF8F0</color>
+    <color name="background_dark">#FF1A1A2E</color>
+
+    <!-- Surface -->
+    <color name="surface_light">#FFFFFFFF</color>
+    <color name="surface_dark">#FF2D2D44</color>
+
+    <!-- Text -->
+    <color name="text_primary">#FF1C1C1E</color>
+    <color name="text_secondary">#FF6E6E78</color>
+    <color name="text_on_primary">#FFFFFFFF</color>
+
+    <!-- Accent -->
+    <color name="live_red">#FFFF3344</color>
+    <color name="gradient_start">#FFFF6B35</color>
+    <color name="gradient_end">#FFFFC107</color>
+</resources>

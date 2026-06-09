@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">奶龍世界</string>
+    <string name="app_name_en">Nailong World</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">主頁</string>
+    <string name="nav_game">遊戲</string>
+    <string name="nav_community">社群</string>
+    <string name="nav_profile">我的</string>
+
+    <!-- Home Screen -->
+    <string name="gallery_title">奶龍藝術館</string>
+    <string name="gallery_subtitle">NAILONG ART GALLERY</string>
+    <string name="live_room">奶龍直播間</string>
+    <string name="enter_live">進入直播間</string>
+    <string name="live_now">直播中</string>
+
+    <!-- Games -->
+    <string name="hot_games">熱門遊戲</string>
+    <string name="see_all">全部</string>
+    <string name="nailong_match">奶龍消消樂</string>
+    <string name="nailong_match_desc">三消連線即消除，特殊方塊帶來連鎖爆擊！</string>
+    <string name="play_now">立即遊玩</string>
+    <string name="recommended">推薦</string>
+    <string name="nailong_art_gallery">奶龍藝術館</string>
+    <string name="nailong_art_desc">奶龍穿越世界名畫，你能認出哪幅原作嗎？16 幅名畫等你探索。</string>
+    <string name="nailong_music_box">奶龍音樂盒</string>
+    <string name="nailong_music_desc">收錄經典奶龍主題曲，隨時隨地聆聽可愛旋律。</string>
+    <string name="nailong_stickers">奶龍表情包</string>
+    <string name="nailong_stickers_desc">超過 50 款可愛奶龍表情，讓你的聊天更加生動有趣。</string>
+
+    <!-- Daily Check-in -->
+    <string name="daily_check_in">每日簽到</string>
+    <string name="consecutive_days">連續 %d 天</string>
+    <string name="check_in_today">今日簽到領獎勵</string>
+    <string name="claim">領取</string>
+</resources>

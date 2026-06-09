@@ -1,0 +1,29 @@
+# ── Android / Gradle ──
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# App-level build outputs
+/app/build
+/app/release
+
+# Keystore (never commit)
+*.jks
+*.keystore
+*.ks
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
