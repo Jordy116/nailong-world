@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.nailong.world"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.nailong.world"
@@ -49,6 +49,11 @@ android {
 dependencies {
     // Material Components (for Compose theme)
     implementation("com.google.android.material:material:1.12.0")
+
+    // Miuix — HyperOS-inspired UI library
+    implementation("top.yukonga.miuix.kmp:miuix-ui:0.9.2")
+    implementation("top.yukonga.miuix.kmp:miuix-blur:0.9.2")
+    implementation("top.yukonga.miuix.kmp:miuix-squircle:0.9.2")
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")

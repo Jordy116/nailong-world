@@ -19,8 +19,8 @@
 
 | 技術 | 版本 |
 |------|------|
-| 語言 | Kotlin 2.0.10 |
-| UI | Jetpack Compose (BOM 2024.06.00) + Compose Compiler Plugin |
+| 語言 | Kotlin 2.0.21 |
+| UI | Miuix (HyperOS) + Jetpack Compose (BOM 2024.06.00) |
 | 架構 | MVVM (ViewModel + StateFlow) |
 | 導航 | Navigation Compose |
 | 圖片加載 | Coil 2.6.0 |
