@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.nailong.world.data.repository.NailongRepository
 import com.nailong.world.ui.game.match3.model.LevelProgress
 import com.nailong.world.ui.game.match3.model.levels
+import androidx.compose.ui.graphics.Color
 
 private val DarkBg = Color(0xFF12141C)
 private val DarkCard = Color(0xFF1E2030)
