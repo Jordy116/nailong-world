@@ -63,7 +63,7 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(color = NailongOrange)
+            CircularProgressIndicator(color = NailongWarmOrange)
         }
         return
     }

@@ -151,7 +151,7 @@ fun GameCard(
                 .fillMaxWidth()
                 .height(120.dp)
                 .background(
-                    Brush.horizontalGradient(listOf(GradientStart, NailongWarmOrange.copy(alpha = 0.6f))),
+                    Brush.horizontalGradient(listOf(NailongWarmOrange, NailongWarmOrange.copy(alpha = 0.6f))),
                     shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
                 ),
             contentAlignment = Alignment.Center,
@@ -209,7 +209,7 @@ fun ContentCard(
                     .size(64.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(
-                        Brush.horizontalGradient(listOf(GradientStart, NailongWarmOrange.copy(alpha = 0.5f))),
+                        Brush.horizontalGradient(listOf(NailongWarmOrange, NailongWarmOrange.copy(alpha = 0.5f))),
                     ),
                 contentAlignment = Alignment.Center,
             ) {
