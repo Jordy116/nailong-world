@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.nailong.world"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.nailong.world"
