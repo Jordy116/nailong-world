@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,11 +40,8 @@ import com.nailong.world.R
 /**
  * 奶龍直播入口長方形 Banner 組件
  *
- * 設計規格：
- * - 黃橙漸層滿版背景
- * - 左側奶龍擁抱圖片（邊緣漸層融合）
- * - 右側文字區 + 右下角 CTA 按鈕
- * - 右上角呼吸燈「直播中」標籤
+ * 左側文字 + 右側去背角色（探頭破格效果）
+ * 黃橙漸層滿版背景 + 呼吸燈「直播中」標籤
  */
 @Composable
 fun NailongLiveBanner(
@@ -61,87 +59,68 @@ fun NailongLiveBanner(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(140.dp)
+                .height(150.dp)
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
-                            Color(0xFFFF8C42),  // 橙
-                            Color(0xFFFFB300),  // 金黃
-                            Color(0xFFFFC107),  // 黃
+                            Color(0xFFFF8C42),
+                            Color(0xFFFFB300),
+                            Color(0xFFFFC107),
                         ),
                     ),
                     shape = RoundedCornerShape(20.dp),
                 ),
         ) {
-            // ── 左側：奶龍圖片（邊緣融合） ──
+            // ── 背景微光 ──
             Box(
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxWidth(0.45f)
-                    .height(140.dp)
-                    .clip(RoundedCornerShape(topStart = 20.dp, bottomStart = 20.dp)),
-                contentAlignment = Alignment.CenterStart,
-            ) {
-                // 底圖
-                androidx.compose.foundation.Image(
-                    painter = painterResource(id = R.drawable.live_banner_image),
-                    contentDescription = "奶龍直播",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp),
-                    contentScale = ContentScale.Crop,
-                )
+                    .align(Alignment.TopStart)
+                    .offset(x = (-10).dp, y = (-20).dp)
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.08f)),
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .offset(x = 30.dp, y = 30.dp)
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.05f)),
+            )
 
-                // 右側漸層遮罩 — 讓圖片邊緣與背景無縫融合
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .width(40.dp)
-                        .height(140.dp)
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color(0xFFFFC107),
-                                ),
-                            ),
-                        ),
-                )
-            }
-
-            // ── 右側文字區 ──
+            // ── 左側文字區 ──
             Column(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+                    .align(Alignment.CenterStart)
+                    .fillMaxWidth(0.55f)
+                    .padding(start = 20.dp),
             ) {
-                // 主標題
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = "奶龍直播",
                     color = Color(0xFF2D1B00),
-                    fontSize = 22.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // 副標題
                 Text(
                     text = "立即加入，與奶龍互動",
                     color = Color(0xFF5C3A00),
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // ── 右下角 CTA 按鈕 ──
+                // CTA 按鈕
                 Row(
                     modifier = Modifier
-                        .align(Alignment.End)
                         .clip(RoundedCornerShape(10.dp))
                         .background(Color(0xFF2D1B00))
-                        .padding(horizontal = 14.dp, vertical = 7.dp),
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -160,6 +139,18 @@ fun NailongLiveBanner(
                 }
             }
 
+            // ── 右側：去背奶龍角色（破格效果） ──
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = R.drawable.live_banner_char),
+                contentDescription = "奶龍直播角色",
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 20.dp, y = 15.dp)
+                    .width(160.dp)
+                    .height(180.dp),
+                contentScale = ContentScale.Fit,
+            )
+
             // ── 右上角「直播中」標籤 ──
             LiveIndicator(
                 modifier = Modifier
@@ -170,12 +161,8 @@ fun NailongLiveBanner(
     }
 }
 
-/**
- * 呼吸燈「直播中」標籤
- */
 @Composable
 private fun LiveIndicator(modifier: Modifier = Modifier) {
-    // 呼吸燈動畫：alpha 0.3 → 1.0 → 0.3 無限循環
     val infiniteTransition = rememberInfiniteTransition(label = "liveBlink")
     val blinkAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f,
@@ -194,7 +181,6 @@ private fun LiveIndicator(modifier: Modifier = Modifier) {
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // 呼吸小紅點
         Box(
             modifier = Modifier
                 .size(7.dp)
