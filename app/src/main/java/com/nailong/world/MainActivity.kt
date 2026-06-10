@@ -4,13 +4,25 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -24,10 +36,9 @@ import com.nailong.world.ui.game.match3.model.GameConfig
 import com.nailong.world.ui.game.match3.model.GameMode
 import com.nailong.world.ui.game.match3.model.LevelProgress
 import com.nailong.world.ui.home.HomeScreen
+import com.nailong.world.ui.navigation.BottomNavItem
 import com.nailong.world.ui.profile.ProfileScreen
 import com.nailong.world.ui.theme.NailongWorldTheme
-import top.yukonga.miuix.kmp.basic.NavigationBar
-import top.yukonga.miuix.kmp.basic.NavigationBarItem
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,40 +54,70 @@ class MainActivity : ComponentActivity() {
 }
 
 object GameConfigHolder {
-    var config: GameConfig by androidx.compose.runtime.mutableStateOf(GameConfig(mode = GameMode.INFINITE))
+    var config: GameConfig by mutableStateOf(GameConfig(mode = GameMode.INFINITE))
 }
 
 @Composable
 fun NailongWorldApp() {
     val navController = rememberNavController()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-    val navItems = com.nailong.world.ui.navigation.BottomNavItem.items
-    val icons = listOf(
-        androidx.compose.material.icons.Icons.Filled.Home,
-        androidx.compose.material.icons.Icons.Filled.Games,
-        androidx.compose.material.icons.Icons.Filled.People,
-        androidx.compose.material.icons.Icons.Filled.Person,
-    )
+    val navItems = BottomNavItem.items
 
-    androidx.compose.foundation.layout.Box(modifier = Modifier.then(androidx.compose.ui.Modifier)) {
-        NavHost(
-            navController = navController,
-            startDestination = "home",
-        ) {
-            composable("home") {
-                androidx.compose.foundation.layout.Column(modifier = Modifier) {
-                    HomeScreen(
-                        onNavigateToGame = {
-                            selectedTab = 1
-                            navController.navigate("game") {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+            ) {
+                navItems.forEachIndexed { index, item ->
+                    val isSelected = selectedTab == index
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = {
+                            selectedTab = index
+                            navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
                         },
-                        onPlayMatch3 = { navController.navigate("match3-menu") },
+                        icon = {
+                            Icon(
+                                imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                contentDescription = item.title,
+                            )
+                        },
+                        label = { Text(text = item.title, fontSize = 12.sp) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                            selectedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            indicatorColor = MaterialTheme.colorScheme.primary,
+                        ),
                     )
                 }
+            }
+        },
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(innerPadding),
+        ) {
+            composable("home") {
+                HomeScreen(
+                    onNavigateToGame = {
+                        selectedTab = 1
+                        navController.navigate("game") {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onPlayMatch3 = { navController.navigate("match3-menu") },
+                )
             }
             composable("game") {
                 GameScreen(
@@ -101,27 +142,6 @@ fun NailongWorldApp() {
             composable("memory-game") {
                 NailongMemoryScreen(onBack = { navController.popBackStack() })
             }
-        }
-    }
-
-    // Miuix NavigationBar with liquid glass styling
-    NavigationBar(
-        modifier = Modifier
-            .align(androidx.compose.ui.Alignment.BottomCenter),
-    ) {
-        navItems.forEachIndexed { index, item ->
-            NavigationBarItem(
-                selected = selectedTab == index,
-                onClick = {
-                    selectedTab = index
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = icons[index],
-            )
         }
     }
 }

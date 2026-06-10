@@ -6,11 +6,11 @@ plugins {
 
 android {
     namespace = "com.nailong.world"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.nailong.world"
-        minSdk = 33
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
@@ -49,14 +49,6 @@ android {
 dependencies {
     // Material Components (for Compose theme)
     implementation("com.google.android.material:material:1.12.0")
-
-    // Miuix — HyperOS-inspired UI components (squircle, blur, top app bar)
-    implementation("top.yukonga.miuix.kmp:miuix-ui:0.9.2")
-    implementation("top.yukonga.miuix.kmp:miuix-blur:0.9.2")
-    implementation("top.yukonga.miuix.kmp:miuix-squircle:0.9.2")
-
-    // AndroidLiquidGlass — Liquid Glass / Backdrop effect (v2.0.0)
-    implementation("io.github.kyant0:backdrop:2.0.0")
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
