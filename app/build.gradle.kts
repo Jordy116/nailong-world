@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.nailong.world"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.nailong.world"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0.0"
 

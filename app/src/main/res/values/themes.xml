@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base Android theme using AppCompat as parent (required by Compose) -->
-    <style name="Theme.NailongWorld" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.NailongWorld" parent="android:Theme.Holo.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
