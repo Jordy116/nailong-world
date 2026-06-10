@@ -95,7 +95,6 @@ fun HomeScreen(
                 onClick = onPlayMatch3,
             )
         }
-        }
 
         // ── Recommended Content ──
         item {
