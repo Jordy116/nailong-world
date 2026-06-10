@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nailong.world.data.repository.NailongRepository
-import com.nailong.world.ui.theme.NailongCharcoal
 import com.nailong.world.ui.theme.NailongWarmGray
 import com.nailong.world.ui.theme.NailongWarmOrange
 import com.nailong.world.viewmodel.GameViewModel
