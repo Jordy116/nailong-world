@@ -125,16 +125,26 @@ class Match3ViewModel : ViewModel() {
         )
 
         // Save progress
-        if (engine.isVictory) {
-            if (config.mode == GameMode.LEVEL && config.level != null) {
+        when {
+            engine.isVictory && config.mode == GameMode.LEVEL && config.level != null -> {
                 LevelProgress.saveHighScore(config.level.id, engine.score)
                 LevelProgress.unlockNext(config.level.id)
-            } else if (config.mode == GameMode.INFINITE) {
+            }
+            config.mode == GameMode.INFINITE -> {
+                // Infinite mode: save on EVERY cascade so score persists
                 LevelProgress.saveHighScore(-1, engine.score)
             }
         }
 
         state = finalState
+    }
+
+    /** Save current score before leaving the game */
+    fun saveScoreOnExit() {
+        val config = currentConfig ?: return
+        if (config.mode == GameMode.INFINITE && engine.score > 0) {
+            LevelProgress.saveHighScore(-1, engine.score)
+        }
     }
 
     fun shuffleBoard() {

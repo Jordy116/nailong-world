@@ -90,7 +90,10 @@ fun NailongMatch3Screen(
         ) {
             Text(
                 text = "← 返回", color = AccentOrange, fontSize = 14.sp,
-                modifier = Modifier.clickable(onClick = onBack),
+                modifier = Modifier.clickable(onClick = {
+                    viewModel.saveScoreOnExit()
+                    onBack()
+                }),
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(

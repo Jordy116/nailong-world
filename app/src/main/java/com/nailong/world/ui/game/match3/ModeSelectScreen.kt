@@ -93,7 +93,8 @@ fun ModeSelectScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // ── Infinite Mode Card ──
+        // ── Infinite Mode Card (prominent) ──
+        Spacer(modifier = Modifier.height(8.dp))
         InfiniteModeCard(
             highScore = LevelProgress.getHighScore(INFINITE),
             onClick = {
@@ -101,7 +102,7 @@ fun ModeSelectScreen(
             },
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
         // ── Section Title ──
         Text(
@@ -157,60 +158,76 @@ private fun InfiniteModeCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
                     brush = Brush.horizontalGradient(listOf(Color(0xFFFF6B35), Color(0xFFFFC107))),
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(24.dp),
                 )
-                .padding(20.dp),
+                .padding(24.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Left: ∞ symbol
+                // Left: large ∞ symbol
                 Box(
                     modifier = Modifier
-                        .size(52.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(Color.White.copy(alpha = 0.25f)),
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White.copy(alpha = 0.2f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(text = "∞", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(text = "∞", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
-                Spacer(modifier = Modifier.width(14.dp))
-                // Middle: text
+                Spacer(modifier = Modifier.width(16.dp))
+                // Middle: prominent text
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "無限模式",
-                        fontSize = 18.sp,
+                        fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "無步數限制，挑戰你的最高分！",
-                        fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 13.sp,
+                        color = Color.White.copy(alpha = 0.85f),
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // CTA badge
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White.copy(alpha = 0.25f))
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                    ) {
+                        Text(
+                            text = "點擊開始 ▶",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                 }
-                // Right: trophy + high score
+                // Right: trophy
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "🏆", fontSize = 22.sp)
-                    Text(
-                        text = "最高分",
-                        fontSize = 9.sp,
-                        color = Color.White.copy(alpha = 0.7f),
-                    )
+                    Text(text = "🏆", fontSize = 28.sp)
                     if (highScore > 0) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "最高分",
+                            fontSize = 10.sp,
+                            color = Color.White.copy(alpha = 0.7f),
+                        )
                         Text(
                             text = "$highScore",
-                            fontSize = 14.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
                         )
