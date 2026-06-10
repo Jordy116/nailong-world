@@ -55,8 +55,8 @@ dependencies {
     implementation("top.yukonga.miuix.kmp:miuix-blur:0.9.2")
     implementation("top.yukonga.miuix.kmp:miuix-squircle:0.9.2")
 
-    // AndroidLiquidGlass — Liquid Glass / Backdrop effect
-    implementation("io.github.kyant0:backdrop:0.1.0")
+    // AndroidLiquidGlass — Liquid Glass / Backdrop effect (v2.0.0)
+    implementation("io.github.kyant0:backdrop:2.0.0")
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
