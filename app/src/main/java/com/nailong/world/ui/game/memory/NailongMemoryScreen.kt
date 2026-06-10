@@ -157,7 +157,7 @@ fun NailongMemoryScreen(
                     onBack = onBack,
                 )
             } else {
-                CardGrid(state)
+                CardGrid(state, onCardClick = { viewModel.onCardClick(it) })
             }
         }
     }
@@ -182,7 +182,7 @@ private fun StatCard(label: String, value: String, modifier: Modifier = Modifier
 
 // ── Card Grid ──
 @Composable
-private fun CardGrid(state: MemoryGameState) {
+private fun CardGrid(state: MemoryGameState, onCardClick: (Int) -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -200,7 +200,7 @@ private fun CardGrid(state: MemoryGameState) {
                     if (card != null) {
                         MemoryCardView(
                             card = card,
-                            onClick = { viewModel.onCardClick(index) },
+                            onClick = { onCardClick(index) },
                             modifier = Modifier.weight(1f),
                         )
                     }
