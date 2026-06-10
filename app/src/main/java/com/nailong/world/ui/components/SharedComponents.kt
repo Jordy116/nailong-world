@@ -28,9 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nailong.world.ui.theme.GradientEnd
-import com.nailong.world.ui.theme.GradientStart
-import com.nailong.world.ui.theme.NailongOrange
+import com.nailong.world.ui.theme.NailongWarmOrange
 
 /**
  * Section header row: title + optional "全部 →" action.
@@ -58,7 +56,7 @@ fun SectionHeader(
             Text(
                 text = actionLabel,
                 style = MaterialTheme.typography.labelLarge,
-                color = NailongOrange,
+                color = NailongWarmOrange,
                 modifier = Modifier.clickable(onClick = onAction),
             )
         }
@@ -79,7 +77,7 @@ fun Badge(
             .then(
                 if (isGradient) {
                     Modifier.background(
-                        Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
+                        Brush.horizontalGradient(listOf(NailongWarmOrange, NailongWarmOrange.copy(alpha = 0.7f))),
                         RoundedCornerShape(4.dp),
                     )
                 } else {
@@ -153,7 +151,7 @@ fun GameCard(
                 .fillMaxWidth()
                 .height(120.dp)
                 .background(
-                    Brush.horizontalGradient(listOf(GradientStart, GradientEnd.copy(alpha = 0.6f))),
+                    Brush.horizontalGradient(listOf(GradientStart, NailongWarmOrange.copy(alpha = 0.6f))),
                     shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
                 ),
             contentAlignment = Alignment.Center,
@@ -211,7 +209,7 @@ fun ContentCard(
                     .size(64.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(
-                        Brush.horizontalGradient(listOf(GradientStart, GradientEnd.copy(alpha = 0.5f))),
+                        Brush.horizontalGradient(listOf(GradientStart, NailongWarmOrange.copy(alpha = 0.5f))),
                     ),
                 contentAlignment = Alignment.Center,
             ) {

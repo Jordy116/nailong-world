@@ -88,7 +88,6 @@ fun NailongWorldApp() {
                             )
                         },
                         label = { Text(text = item.title, fontSize = 12.sp) },
-                        shape = RoundedCornerShape(16.dp),
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                             selectedTextColor = MaterialTheme.colorScheme.onPrimary,

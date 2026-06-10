@@ -44,10 +44,8 @@ import com.nailong.world.ui.components.LiveChip
 import com.nailong.world.ui.components.NailongLiveBanner
 import com.nailong.world.ui.components.NailongMatch3Banner
 import com.nailong.world.ui.components.SectionHeader
-import com.nailong.world.ui.theme.GradientEnd
-import com.nailong.world.ui.theme.GradientStart
-import com.nailong.world.ui.theme.NailongOrange
-import com.nailong.world.ui.theme.TextSecondary
+import com.nailong.world.ui.theme.NailongWarmOrange
+import com.nailong.world.ui.theme.NailongWarmGray
 import com.nailong.world.viewmodel.HomeViewModel
 import com.nailong.world.R
 
@@ -139,7 +137,7 @@ private fun GalleryHeader() {
             .fillMaxWidth()
             .height(240.dp)
             .background(
-                Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
+                Brush.horizontalGradient(listOf(NailongWarmOrange, NailongWarmOrange.copy(alpha = 0.7f))),
                 shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
             ),
     ) {
@@ -239,7 +237,7 @@ private fun CheckInCard(
                 Text(
                     text = "連續 $consecutiveDays 天 · 今日簽到領獎勵",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = NailongWarmGray,
                 )
             }
             Button(
@@ -247,7 +245,7 @@ private fun CheckInCard(
                 enabled = !hasCheckedIn,
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (hasCheckedIn) TextSecondary else NailongOrange,
+                    containerColor = if (hasCheckedIn) NailongWarmGray else NailongWarmOrange,
                 ),
             ) {
                 Text(

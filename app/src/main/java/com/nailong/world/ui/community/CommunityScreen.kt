@@ -28,10 +28,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nailong.world.ui.theme.GradientEnd
-import com.nailong.world.ui.theme.GradientStart
-import com.nailong.world.ui.theme.NailongOrange
-import com.nailong.world.ui.theme.TextSecondary
+import com.nailong.world.ui.theme.NailongWarmOrange
+import com.nailong.world.ui.theme.NailongWarmGray
 
 /**
  * Community screen — placeholder showing a feed of mock posts.
@@ -64,7 +62,7 @@ fun CommunityScreen(modifier: Modifier = Modifier) {
             Text(
                 text = "和龍友們一起分享快樂！",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextSecondary,
+                color = NailongWarmGray,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
@@ -101,7 +99,7 @@ private fun CommunityPostCard(post: CommunityPost) {
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(
-                            Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
+                            Brush.horizontalGradient(listOf(NailongWarmOrange, NailongWarmOrange.copy(alpha = 0.7f))),
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -127,12 +125,12 @@ private fun CommunityPostCard(post: CommunityPost) {
                 Text(
                     text = "❤️ ${post.likes}",
                     style = MaterialTheme.typography.labelMedium,
-                    color = TextSecondary,
+                    color = NailongWarmGray,
                 )
                 Text(
                     text = "💬 ${post.comments}",
                     style = MaterialTheme.typography.labelMedium,
-                    color = TextSecondary,
+                    color = NailongWarmGray,
                 )
             }
         }
