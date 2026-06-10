@@ -19,13 +19,13 @@
 
 | 技術 | 版本 |
 |------|------|
-| 語言 | Kotlin 1.9.22 |
-| UI | Jetpack Compose (BOM 2024.01.00) |
+| 語言 | Kotlin 2.0.10 |
+| UI | Jetpack Compose (BOM 2024.06.00) + Compose Compiler Plugin |
 | 架構 | MVVM (ViewModel + StateFlow) |
 | 導航 | Navigation Compose |
-| 圖片加載 | Coil 2.5.0 |
+| 圖片加載 | Coil 2.6.0 |
 | 網絡請求 | Retrofit 2.9.0 + OkHttp 4.12.0 |
-| 依賴管理 | Gradle 8.4 + Kotlin DSL |
+| 依賴管理 | Gradle 8.7 + Kotlin DSL |
 | 最低支持 | Android 8.0 (API 26) |
 | 目標 SDK | Android 14 (API 34) |
 
