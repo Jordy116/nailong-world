@@ -1,6 +1,8 @@
 package com.nailong.world
 
 import android.os.Bundle
+import com.nailong.world.data.GameDataStore
+import com.nailong.world.ui.game.match3.model.LevelProgress
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -39,6 +41,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Initialize game data persistence
+        LevelProgress.init(GameDataStore(applicationContext))
         setContent {
             NailongWorldTheme {
                 NailongWorldApp()

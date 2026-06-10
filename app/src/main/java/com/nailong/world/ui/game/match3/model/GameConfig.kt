@@ -1,5 +1,7 @@
 package com.nailong.world.ui.game.match3.model
 
+import com.nailong.world.data.GameDataStore
+
 /**
  * Represents a game level with specific constraints.
  * Levels 1-4 are unlocked by default; 5-7 require the previous level to be cleared.
@@ -27,52 +29,53 @@ val levels = listOf(
 )
 
 /**
- * In-memory persistence for unlock progress. In production this would use
- * SharedPreferences / DataStore.
+ * Persistence layer backed by GameDataStore.
+ * Must be initialized once with a GameDataStore instance before use.
  */
 object LevelProgress {
-    private val unlockedLevels = mutableSetOf(1, 2, 3, 4)
+    private var store: GameDataStore? = null
 
-    fun isUnlocked(levelId: Int): Boolean = levelId in unlockedLevels
+    fun init(dataStore: GameDataStore) {
+        store = dataStore
+    }
+
+    private fun requireStore(): GameDataStore = store
+        ?: throw IllegalStateException("LevelProgress.init() must be called with a GameDataStore instance")
+
+    fun isUnlocked(levelId: Int): Boolean = requireStore().isLevelUnlocked(levelId)
 
     fun unlockNext(clearedLevelId: Int) {
         val nextId = clearedLevelId + 1
         if (nextId <= levels.size) {
-            unlockedLevels.add(nextId)
+            requireStore().unlockLevel(nextId)
         }
     }
 
     fun getHighScore(levelId: Int): Int = when (levelId) {
-        -1 -> infiniteHighScore
-        else -> levelHighScores.getOrDefault(levelId, 0)
+        -1 -> requireStore().getInfiniteHighScore()
+        else -> requireStore().getLevelHighScore(levelId)
     }
 
     fun saveHighScore(levelId: Int, score: Int) {
-        if (levelId == -1) {
-            if (score > infiniteHighScore) infiniteHighScore = score
-        } else {
-            val current = levelHighScores.getOrDefault(levelId, 0)
-            if (score > current) levelHighScores[levelId] = score
+        when (levelId) {
+            -1 -> requireStore().saveInfiniteHighScore(score)
+            else -> requireStore().saveLevelHighScore(levelId, score)
         }
     }
 
-    private var infiniteHighScore = 0
-    private val levelHighScores = mutableMapOf<Int, Int>()
-
     fun resetAll() {
-        unlockedLevels.clear()
-        unlockedLevels.addAll(setOf(1, 2, 3, 4))
-        infiniteHighScore = 0
-        levelHighScores.clear()
+        requireStore().resetAll()
     }
+
+    fun getStore(): GameDataStore = requireStore()
 }
 
 /**
  * Game mode selection.
  */
 enum class GameMode {
-    INFINITE,   // No move limit, track high score
-    LEVEL,      // Level-based with target score and move limit
+    INFINITE,
+    LEVEL,
 }
 
 /**
@@ -80,7 +83,7 @@ enum class GameMode {
  */
 data class GameConfig(
     val mode: GameMode,
-    val level: LevelConfig? = null, // null for infinite
+    val level: LevelConfig? = null,
 ) {
     val hasMoveLimit: Boolean get() = mode == GameMode.LEVEL
     val targetScore: Int get() = level?.targetScore ?: 0
