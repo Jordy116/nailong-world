@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nailong.world.R
+import com.nailong.world.viewmodel.MemoryGameState
 import com.nailong.world.viewmodel.MemoryViewModel
 
 // ── Colours ──
