@@ -58,6 +58,10 @@ private val tileResources = listOf(
     R.drawable.tile_nailong_5, R.drawable.tile_nailong_6,
 )
 
+/** Animation durations for cascade */
+private const val MATCHED_FADE_MS = 250
+private const val COMBO_GAP_MS = 200
+
 private const val SWIPE_THRESHOLD_DP = 15f
 
 @Composable
@@ -130,6 +134,8 @@ fun NailongMatch3Screen(
             else -> GameBoard(
                 board = state.board,
                 selectedTile = state.selectedTile,
+                matchedPositions = state.matchedPositions,
+                comboText = state.comboText,
                 onTileClick = { viewModel.onTileClick(it) },
                 onSwipe = { from, to -> viewModel.onSwipe(from, to) },
             )
@@ -183,87 +189,112 @@ private fun StatCard(label: String, value: String) {
 private fun GameBoard(
     board: List<List<Tile>>,
     selectedTile: BoardPosition?,
+    matchedPositions: Set<BoardPosition>,
+    comboText: String?,
     onTileClick: (BoardPosition) -> Unit,
     onSwipe: (BoardPosition, BoardPosition) -> Unit,
 ) {
     val density = LocalDensity.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-    ) {
-        for (row in 0 until BOARD_SIZE) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(3.dp),
-            ) {
-                for (col in 0 until BOARD_SIZE) {
-                    val pos = BoardPosition(row, col)
-                    val tile = if (row < board.size && col < board[row].size) board[row][col] else Tile(-1)
-                    val isSelected = selectedTile == pos
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(3.dp),
+        ) {
+            for (row in 0 until BOARD_SIZE) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp),
+                ) {
+                    for (col in 0 until BOARD_SIZE) {
+                        val pos = BoardPosition(row, col)
+                        val tile = if (row < board.size && col < board[row].size) board[row][col] else Tile(-1)
+                        val isSelected = selectedTile == pos
+                        val isMatched = pos in matchedPositions
 
-                    val bgColor = when {
-                        tile.isObstacle -> Color(0xFF11131A)
-                        tile.isPlayable -> DarkSurface
-                        else -> Color(0xFF1A1C28)
-                    }
+                        val bgColor = when {
+                            tile.isObstacle -> Color(0xFF11131A)
+                            tile.isPlayable -> DarkSurface
+                            else -> Color(0xFF1A1C28)
+                        }
 
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(bgColor)
-                            .then(
-                                if (isSelected) Modifier.border(2.dp, AccentOrange, RoundedCornerShape(6.dp))
-                                else if (tile.isObstacle) Modifier.border(1.dp, Color(0xFF333344), RoundedCornerShape(6.dp))
-                                else Modifier
-                            )
-                            .then(
-                                if (tile.isPlayable) Modifier.pointerInput(pos) {
-                                    detectDragGestures(
-                                        onDragStart = { onTileClick(pos) },
-                                        onDrag = { change, dragAmount ->
-                                            change.consume()
-                                            val thresholdPx = with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
-                                            val dx = dragAmount.x; val dy = dragAmount.y
-                                            val targetRow = when {
-                                                dy < -thresholdPx -> pos.row - 1
-                                                dy > thresholdPx -> pos.row + 1
-                                                else -> pos.row
-                                            }
-                                            val targetCol = when {
-                                                dx < -thresholdPx -> pos.col - 1
-                                                dx > thresholdPx -> pos.col + 1
-                                                else -> pos.col
-                                            }
-                                            if ((targetRow != pos.row || targetCol != pos.col) &&
-                                                targetRow in 0 until BOARD_SIZE && targetCol in 0 until BOARD_SIZE) {
-                                                onSwipe(pos, BoardPosition(targetRow, targetCol))
-                                            }
-                                        },
-                                    )
-                                } else Modifier
-                            ),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        when {
-                            tile.isObstacle -> Text(text = "🧱", fontSize = 16.sp)
-                            tile.isPlayable -> {
-                                val resId = tileResources[tile.type]
-                                androidx.compose.foundation.Image(
-                                    painter = painterResource(id = resId),
-                                    contentDescription = "Tile ${tile.type}",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop,
+                        // Fade-out animation for matched tiles
+                        val alpha by animateFloatAsState(
+                            targetValue = if (isMatched) 0f else 1f,
+                            animationSpec = tween(durationMillis = 300),
+                            label = "tileAlpha",
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(bgColor)
+                                .then(
+                                    when {
+                                        isSelected -> Modifier.border(2.dp, AccentOrange, RoundedCornerShape(6.dp))
+                                        tile.isObstacle -> Modifier.border(1.dp, Color(0xFF333344), RoundedCornerShape(6.dp))
+                                        else -> Modifier
+                                    }
                                 )
+                                .then(
+                                    if (tile.isPlayable) Modifier.pointerInput(pos) {
+                                        detectDragGestures(
+                                            onDragStart = { onTileClick(pos) },
+                                            onDrag = { change, dragAmount ->
+                                                change.consume()
+                                                val thresholdPx = with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
+                                                val dx = dragAmount.x; val dy = dragAmount.y
+                                                val targetRow = when {
+                                                    dy < -thresholdPx -> pos.row - 1
+                                                    dy > thresholdPx -> pos.row + 1
+                                                    else -> pos.row
+                                                }
+                                                val targetCol = when {
+                                                    dx < -thresholdPx -> pos.col - 1
+                                                    dx > thresholdPx -> pos.col + 1
+                                                    else -> pos.col
+                                                }
+                                                if ((targetRow != pos.row || targetCol != pos.col) &&
+                                                    targetRow in 0 until BOARD_SIZE && targetCol in 0 until BOARD_SIZE) {
+                                                    onSwipe(pos, BoardPosition(targetRow, targetCol))
+                                                }
+                                            },
+                                        )
+                                    } else Modifier
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            when {
+                                tile.isObstacle -> Text(text = "🧱", fontSize = 16.sp)
+                                tile.isPlayable -> {
+                                    val resId = tileResources[tile.type]
+                                    androidx.compose.foundation.Image(
+                                        painter = painterResource(id = resId),
+                                        contentDescription = "Tile ${tile.type}",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop,
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+
+        // Combo text overlay
+        if (comboText != null) {
+            Text(
+                text = comboText,
+                color = AccentYellow,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 12.dp),
+            )
         }
     }
 }

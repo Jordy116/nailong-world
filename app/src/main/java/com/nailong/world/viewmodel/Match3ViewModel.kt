@@ -4,13 +4,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.nailong.world.ui.game.match3.BOARD_SIZE
 import com.nailong.world.ui.game.match3.BoardPosition
+import com.nailong.world.ui.game.match3.CascadeStep
 import com.nailong.world.ui.game.match3.Match3Engine
 import com.nailong.world.ui.game.match3.Tile
 import com.nailong.world.ui.game.match3.model.GameConfig
 import com.nailong.world.ui.game.match3.model.GameMode
 import com.nailong.world.ui.game.match3.model.LevelProgress
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 data class Match3GameState(
     val board: List<List<Tile>> = List(BOARD_SIZE) { List(BOARD_SIZE) { Tile(0) } },
@@ -23,6 +27,10 @@ data class Match3GameState(
     val selectedTile: BoardPosition? = null,
     val gameMode: GameMode = GameMode.INFINITE,
     val levelId: Int = -1,
+    /** Currently shown matched positions (for fade-out animation) */
+    val matchedPositions: Set<BoardPosition> = emptySet(),
+    /** Current combo text to show (e.g. "Combo x2 +120") */
+    val comboText: String? = null,
 )
 
 class Match3ViewModel : ViewModel() {
@@ -38,41 +46,25 @@ class Match3ViewModel : ViewModel() {
         startGame(config)
     }
 
-    /** Start a game with the given configuration */
     fun startGame(config: GameConfig) {
         currentConfig = config
         engine.initBoard()
-
         when (config.mode) {
-            GameMode.INFINITE -> {
-                engine.configureInfinite()
-            }
+            GameMode.INFINITE -> engine.configureInfinite()
             GameMode.LEVEL -> {
                 val level = config.level
-                if (level != null) {
-                    engine.configureLevel(level.obstacles, level.moves, level.targetScore)
-                }
+                if (level != null) engine.configureLevel(level.obstacles, level.moves, level.targetScore)
             }
         }
-
         updateState(config)
     }
 
     fun onTileClick(pos: BoardPosition) {
         if (state.isAnimating || state.isGameOver || state.isVictory) return
-
-        val currentSelected = state.selectedTile
-        if (currentSelected == null) {
-            state = state.copy(selectedTile = pos)
-            return
-        }
-
-        if (currentSelected == pos) {
-            state = state.copy(selectedTile = null)
-            return
-        }
-
-        performSwap(currentSelected, pos)
+        val current = state.selectedTile
+        if (current == null) { state = state.copy(selectedTile = pos); return }
+        if (current == pos) { state = state.copy(selectedTile = null); return }
+        performSwap(current, pos)
     }
 
     fun onSwipe(from: BoardPosition, to: BoardPosition) {
@@ -85,36 +77,42 @@ class Match3ViewModel : ViewModel() {
             state = state.copy(selectedTile = null)
             return
         }
-
         state = state.copy(selectedTile = null, isAnimating = true)
-        engine.processFullCascade()
-        currentConfig?.let { updateState(it) }
-        state = state.copy(isAnimating = false)
+
+        // Run staggered cascade in viewModelScope
+        viewModelScope.launch {
+            animateCascade()
+        }
     }
 
-    fun shuffleBoard() {
-        if (state.isAnimating || state.isGameOver) return
-        engine.shuffleBoard()
-        currentConfig?.let { updateState(it) }
-    }
+    /** Animate each cascade step with staggered delays */
+    private suspend fun animateCascade() {
+        val steps = engine.processCascadeSteps()
+        val config = currentConfig ?: return
 
-    private fun updateState(config: GameConfig) {
-        val boardList = engine.board.map { row ->
-            row.map { it.copy() }.toList()
-        }.toList()
+        for ((index, step) in steps.withIndex()) {
+            // Show matched tiles highlight + combo text
+            state = state.copy(
+                matchedPositions = step.matchedPositions.toSet(),
+                comboText = "Combo x${step.comboCount}  +${step.pointsGained}",
+                score = engine.score,
+            )
 
-        // Save progress on victory
-        if (engine.isVictory) {
-            if (config.mode == GameMode.LEVEL && config.level != null) {
-                LevelProgress.saveHighScore(config.level.id, engine.score)
-                LevelProgress.unlockNext(config.level.id)
-            } else if (config.mode == GameMode.INFINITE) {
-                LevelProgress.saveHighScore(-1, engine.score)
+            // Fade-out duration: hold matched state visible
+            delay(250L) // 0.25s delay per cascade step
+
+            // Clear matched state, update board to show post-gravity state
+            updateState(config)
+
+            // Brief pause between combos
+            if (index < steps.size - 1) {
+                delay(200L) // 0.2s gap between combos
             }
         }
 
-        state = Match3GameState(
-            board = boardList,
+        // Check game end conditions
+        val finalState = Match3GameState(
+            board = engine.board.map { row -> row.map { it.copy() }.toList() }.toList(),
             score = engine.score,
             movesLeft = engine.movesLeft,
             targetScore = config.targetScore,
@@ -124,6 +122,41 @@ class Match3ViewModel : ViewModel() {
             selectedTile = null,
             gameMode = config.mode,
             levelId = config.level?.id ?: -1,
+        )
+
+        // Save progress
+        if (engine.isVictory) {
+            if (config.mode == GameMode.LEVEL && config.level != null) {
+                LevelProgress.saveHighScore(config.level.id, engine.score)
+                LevelProgress.unlockNext(config.level.id)
+            } else if (config.mode == GameMode.INFINITE) {
+                LevelProgress.saveHighScore(-1, engine.score)
+            }
+        }
+
+        state = finalState
+    }
+
+    fun shuffleBoard() {
+        if (state.isAnimating || state.isGameOver) return
+        engine.shuffleBoard()
+        currentConfig?.let { updateState(it) }
+    }
+
+    private fun updateState(config: GameConfig) {
+        state = Match3GameState(
+            board = engine.board.map { row -> row.map { it.copy() }.toList() }.toList(),
+            score = engine.score,
+            movesLeft = engine.movesLeft,
+            targetScore = config.targetScore,
+            isGameOver = engine.isGameOver(),
+            isVictory = engine.isVictory,
+            isAnimating = state.isAnimating,
+            selectedTile = null,
+            gameMode = config.mode,
+            levelId = config.level?.id ?: -1,
+            matchedPositions = state.matchedPositions,
+            comboText = state.comboText,
         )
     }
 }

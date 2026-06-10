@@ -1,10 +1,11 @@
 package com.nailong.world.ui.game.match3
 
 import kotlin.random.Random
+import kotlinx.coroutines.delay
 
 /**
  * Core match-3 game engine.
- * 8x8 grid. Tile type 0..5 = 6 奶龍 images; type -1 = empty; type -2 = obstacle (unmovable).
+ * 8x8 grid. Tile type 0..5 = 6 奶龍 images; type -1 = empty; type -2 = obstacle.
  */
 
 const val BOARD_SIZE = 8
@@ -16,13 +17,19 @@ data class Tile(val type: Int) {
         val Empty = Tile(-1)
         val Obstacle = Tile(OBSTACLE_TYPE)
     }
-
     val isObstacle: Boolean get() = type == OBSTACLE_TYPE
     val isEmpty: Boolean get() = type == -1
     val isPlayable: Boolean get() = type in 0 until TILE_TYPES
 }
 
 data class BoardPosition(val row: Int, val col: Int)
+
+/** A single step in the cascade: which positions matched / what score gained */
+data class CascadeStep(
+    val matchedPositions: List<BoardPosition>,
+    val pointsGained: Int,
+    val comboCount: Int,
+)
 
 class Match3Engine {
 
@@ -53,7 +60,6 @@ class Match3Engine {
         }
     }
 
-    /** Configure for level mode with obstacles. Call after initBoard. */
     fun configureLevel(obstacles: Int, totalMoves: Int, target: Int) {
         movesLeft = totalMoves
         targetScore = target
@@ -61,7 +67,6 @@ class Match3Engine {
         placeObstacles(obstacles)
     }
 
-    /** Configure for infinite mode (no move limit). */
     fun configureInfinite() {
         movesLeft = Int.MAX_VALUE
         targetScore = 0
@@ -99,52 +104,58 @@ class Match3Engine {
     fun trySwap(pos1: BoardPosition, pos2: BoardPosition): Boolean {
         if (!areAdjacent(pos1, pos2)) return false
         if (board[pos1.row][pos1.col].isObstacle || board[pos2.row][pos2.col].isObstacle) return false
-
         swap(pos1, pos2)
         val matches = findAllMatches()
         if (matches.isEmpty()) {
             swap(pos1, pos2)
             return false
         }
-
         if (isLevelMode) movesLeft--
         return true
     }
 
-    /** Full cascade: remove matches, gravity, fill, repeat. Returns total points gained this turn. */
-    fun processFullCascade(): Int {
-        var totalGained = 0
-        var comboMultiplier = 1
+    /**
+     * Process cascade one step at a time, returning each step for animation.
+     * Returns all steps; caller decides timing.
+     */
+    fun processCascadeSteps(): List<CascadeStep> {
+        val steps = mutableListOf<CascadeStep>()
+        var combo = 1
 
         while (true) {
             val matches = findAllMatches()
             if (matches.isEmpty()) break
 
+            val allMatched = mutableListOf<BoardPosition>()
             var matchedCount = 0
             for (match in matches) {
                 matchedCount += match.size
+                allMatched.addAll(match)
                 for (pos in match) {
                     board[pos.row][pos.col] = Tile.Empty
                 }
             }
 
-            val points = matchedCount * 10 * matchedCount * comboMultiplier
-            totalGained += points
-            comboMultiplier++
+            val points = matchedCount * 10 * matchedCount * combo
+            score += points
+            steps.add(CascadeStep(allMatched.toList(), points, combo))
+            combo++
 
             applyGravity()
             fillEmpty()
-        }
-
-        if (totalGained > 0) {
-            score += totalGained
         }
 
         if (isLevelMode && score >= targetScore) {
             isVictory = true
         }
 
-        return totalGained
+        return steps
+    }
+
+    /** Legacy: process everything at once, return total points */
+    fun processFullCascade(): Int {
+        val steps = processCascadeSteps()
+        return steps.sumOf { it.pointsGained }
     }
 
     private fun swap(pos1: BoardPosition, pos2: BoardPosition) {
@@ -159,9 +170,7 @@ class Match3Engine {
             for (row in (BOARD_SIZE - 1) downTo 0) {
                 if (!board[row][col].isEmpty && !board[row][col].isObstacle) {
                     board[writeRow][col] = board[row][col]
-                    if (writeRow != row) {
-                        board[row][col] = Tile.Empty
-                    }
+                    if (writeRow != row) board[row][col] = Tile.Empty
                     writeRow--
                 }
             }
@@ -178,43 +187,31 @@ class Match3Engine {
         }
     }
 
-    /** Obstacles count as filled — they're skipped in matching. */
     fun findAllMatches(): List<List<BoardPosition>> {
-        val allMatches = mutableListOf<List<BoardPosition>>()
-
+        val all = mutableListOf<List<BoardPosition>>()
         for (row in 0 until BOARD_SIZE) {
             var col = 0
             while (col < BOARD_SIZE) {
-                val tile = board[row][col]
-                if (!tile.isPlayable) { col++; continue }
+                val t = board[row][col]
+                if (!t.isPlayable) { col++; continue }
                 var end = col + 1
-                while (end < BOARD_SIZE && board[row][end].type == tile.type) {
-                    end++
-                }
-                if (end - col >= 3) {
-                    allMatches.add((col until end).map { BoardPosition(row, it) })
-                }
+                while (end < BOARD_SIZE && board[row][end].type == t.type) end++
+                if (end - col >= 3) all.add((col until end).map { BoardPosition(row, it) })
                 col = end
             }
         }
-
         for (col in 0 until BOARD_SIZE) {
             var row = 0
             while (row < BOARD_SIZE) {
-                val tile = board[row][col]
-                if (!tile.isPlayable) { row++; continue }
+                val t = board[row][col]
+                if (!t.isPlayable) { row++; continue }
                 var end = row + 1
-                while (end < BOARD_SIZE && board[end][col].type == tile.type) {
-                    end++
-                }
-                if (end - row >= 3) {
-                    allMatches.add((row until end).map { BoardPosition(it, col) })
-                }
+                while (end < BOARD_SIZE && board[end][col].type == t.type) end++
+                if (end - row >= 3) all.add((row until end).map { BoardPosition(it, col) })
                 row = end
             }
         }
-
-        return allMatches
+        return all
     }
 
     fun hasValidMoves(): Boolean {
@@ -240,25 +237,18 @@ class Match3Engine {
 
     fun shuffleBoard() {
         do {
-            for (row in 0 until BOARD_SIZE) {
-                for (col in 0 until BOARD_SIZE) {
-                    if (board[row][col].isPlayable) {
+            for (row in 0 until BOARD_SIZE)
+                for (col in 0 until BOARD_SIZE)
+                    if (board[row][col].isPlayable)
                         board[row][col] = Tile(Random.nextInt(TILE_TYPES))
-                    }
-                }
-            }
         } while (!hasValidMoves() || findAllMatches().isNotEmpty())
-
         while (true) {
             val matches = findAllMatches()
             if (matches.isEmpty()) break
-            for (match in matches) {
-                for (pos in match) {
-                    if (board[pos.row][pos.col].isPlayable) {
+            for (match in matches)
+                for (pos in match)
+                    if (board[pos.row][pos.col].isPlayable)
                         board[pos.row][pos.col] = Tile(Random.nextInt(TILE_TYPES))
-                    }
-                }
-            }
         }
     }
 
