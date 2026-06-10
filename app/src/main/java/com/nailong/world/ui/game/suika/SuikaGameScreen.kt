@@ -220,11 +220,7 @@ fun SuikaGameScreen(
                             .fillMaxSize()
                             .clip(CircleShape)
                             .background(DarkSurface)
-                            .then(
-                                androidx.compose.foundation.border(
-                                    3.dp, levelColors[d.level.coerceIn(1, 6) - 1], CircleShape
-                                )
-                            ),
+                            .border(3.dp, levelColors[d.level.coerceIn(1, 6) - 1], CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         val img = tileResources[d.level.coerceIn(1, 6) - 1]
@@ -256,11 +252,7 @@ fun SuikaGameScreen(
                             .fillMaxSize()
                             .clip(CircleShape)
                             .background(DarkSurface)
-                            .then(
-                                androidx.compose.foundation.border(
-                                    2.dp, levelColors[d.level.coerceIn(1, 6) - 1], CircleShape
-                                )
-                            ),
+                            .border(2.dp, levelColors[d.level.coerceIn(1, 6) - 1], CircleShape),
                         contentAlignment = Alignment.Center,
                     ) {
                         val img = tileResources[d.level.coerceIn(1, 6) - 1]
