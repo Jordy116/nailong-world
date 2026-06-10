@@ -54,6 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nailong.world.R
+import com.nailong.world.viewmodel.SuikaGameParticle
+import com.nailong.world.viewmodel.SuikaMergeEffect
+import com.nailong.world.viewmodel.SuikaUiState
 import com.nailong.world.viewmodel.SuikaViewModel
 
 // ── Colours ──
