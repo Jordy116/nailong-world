@@ -55,7 +55,7 @@ class SuikaViewModel : ViewModel() {
             while (isActive && !engine.isGameOver) {
                 engine.update()
                 updateState()
-                delay(16)  // ~60fps
+                delay(20)  // ~50fps — smoother visual perf
             }
         }
     }

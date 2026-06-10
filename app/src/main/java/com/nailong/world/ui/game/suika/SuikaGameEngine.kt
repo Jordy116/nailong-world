@@ -405,14 +405,14 @@ class SuikaGameEngine {
         }
     }
 
-    /** Check if a drop position is valid (not overlapping existing dragons at top) */
+    /** Check if drop position is valid (not blocked by existing dragons) */
     fun isValidDrop(x: Float, radius: Float): Boolean {
+        val dropY = SuikaContainer.DANGER_LINE + radius + 20f
         for (d in dragons) {
             if (!d.isActive) continue
             val dx = d.x - x
-            val dy = d.y - (SuikaContainer.DANGER_LINE + radius + 20f)
-            val dist = sqrt(dx * dx + dy * dy)
-            if (dist < d.radius + radius + 5f) return false
+            val dy = d.y - dropY
+            if (dx * dx + dy * dy < (d.radius + radius + 5f) * (d.radius + radius + 5f)) return false
         }
         return true
     }
