@@ -15,18 +15,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nailong.world.ui.community.CommunityScreen
 import com.nailong.world.ui.game.GameScreen
+import com.nailong.world.ui.game.match3.ModeSelectScreen
 import com.nailong.world.ui.game.match3.NailongMatch3Screen
+import com.nailong.world.ui.game.match3.model.GameConfig
+import com.nailong.world.ui.game.match3.model.GameMode
 import com.nailong.world.ui.home.HomeScreen
 import com.nailong.world.ui.navigation.BottomNavItem
 import com.nailong.world.ui.profile.ProfileScreen
@@ -42,6 +45,13 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+/**
+ * Shared game config state — set by ModeSelectScreen, read by the game screen.
+ */
+object GameConfigHolder {
+    var config: GameConfig by mutableStateOf(GameConfig(mode = GameMode.INFINITE))
 }
 
 @Composable
@@ -61,11 +71,8 @@ fun NailongWorldApp() {
                         selected = selectedTab == index,
                         onClick = {
                             selectedTab = index
-                            // Navigate using the navController route
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
@@ -105,14 +112,14 @@ fun NailongWorldApp() {
                         }
                     },
                     onPlayMatch3 = {
-                        navController.navigate("match3")
+                        navController.navigate("match3-menu")
                     },
                 )
             }
             composable("game") {
                 GameScreen(
                     onPlayMatch3 = {
-                        navController.navigate("match3")
+                        navController.navigate("match3-menu")
                     },
                 )
             }
@@ -122,7 +129,16 @@ fun NailongWorldApp() {
             composable("profile") {
                 ProfileScreen()
             }
-            composable("match3") {
+            composable("match3-menu") {
+                ModeSelectScreen(
+                    onBack = { navController.popBackStack() },
+                    onStartGame = { config ->
+                        GameConfigHolder.config = config
+                        navController.navigate("match3-game")
+                    },
+                )
+            }
+            composable("match3-game") {
                 NailongMatch3Screen(
                     onBack = { navController.popBackStack() },
                 )
