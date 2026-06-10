@@ -1,7 +1,6 @@
 package com.nailong.world.ui.theme
 
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -14,35 +13,37 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = NailongOrange,
+    primary = NailongWarmOrange,
     onPrimary = Color.White,
-    primaryContainer = CardLight,
-    secondary = NailongCoral,
+    primaryContainer = NailongLightGold,
+    onPrimaryContainer = NailongCharcoal,
+    secondary = NailongSoftCoral,
     onSecondary = Color.White,
-    tertiary = NailongYellow,
-    background = BackgroundLight,
-    onBackground = TextPrimary,
-    surface = SurfaceLight,
-    onSurface = TextPrimary,
-    surfaceVariant = CardLight,
-    onSurfaceVariant = TextSecondary,
-    outline = Color(0xFFDDD0C0),
+    tertiary = NailongWarmOrange,
+    background = NailongYellow,
+    onBackground = NailongCharcoal,
+    surface = NailongCream,
+    onSurface = NailongCharcoal,
+    surfaceVariant = NailongCardBg,
+    onSurfaceVariant = NailongWarmGray,
+    outline = NailongCardStroke,
+    outlineVariant = NailongCardStroke.copy(alpha = 0.5f),
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = NailongOrange,
+    primary = NailongWarmOrange,
     onPrimary = Color.White,
-    primaryContainer = CardDark,
-    secondary = NailongCoral,
+    primaryContainer = NailongWarmOrange.copy(alpha = 0.2f),
+    onPrimaryContainer = NailongLightGold,
+    secondary = NailongSoftCoral,
     onSecondary = Color.White,
-    tertiary = NailongGold,
-    background = BackgroundDark,
-    onBackground = TextOnDark,
-    surface = SurfaceDark,
-    onSurface = TextOnDark,
-    surfaceVariant = CardDark,
-    onSurfaceVariant = TextSecondaryDark,
-    outline = Color(0xFF44445A),
+    background = NailongDarkBg,
+    onBackground = NailongDarkText,
+    surface = NailongDarkCard,
+    onSurface = NailongDarkText,
+    surfaceVariant = NailongDarkSurface,
+    onSurfaceVariant = NailongDarkSecondary,
+    outline = NailongDarkSurface,
 )
 
 @Composable
@@ -52,7 +53,6 @@ fun NailongWorldTheme(
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
-    // Set status bar color
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -64,6 +64,7 @@ fun NailongWorldTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = NailongTypography,
         content = content
     )
 }

@@ -2,29 +2,21 @@ package com.nailong.world.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Brand Palette ──
-val NailongOrange = Color(0xFFFF6B35)
-val NailongCoral = Color(0xFFFF8C42)
-val NailongYellow = Color(0xFFFFC107)
-val NailongGold = Color(0xFFFFD54F)
+// ── Warm Pastel Palette ──
+val NailongYellow = Color(0xFFFFF9E6)       // soft pastel yellow bg
+val NailongCream = Color(0xFFFAFAF7)         // cream white surface
+val NailongWarmOrange = Color(0xFFFF9F43)    // gentle warm orange accent
+val NailongSoftCoral = Color(0xFFFFB088)     // soft coral
+val NailongLightGold = Color(0xFFFFDDB5)     // light gold
+val NailongCharcoal = Color(0xFF2D2D2D)      // nearly-black text
+val NailongWarmGray = Color(0xFF8E8E93)      // secondary text
+val NailongCardBg = Color(0xFFFFF5ED)        // warm card background
+val NailongCardStroke = Color(0xFFFFE8D8)    // card border
+val NailongBg = Color(0xFFFFF9E6)            // main background
 
-// ── Light Theme ──
-val BackgroundLight = Color(0xFFFFF8F0)
-val SurfaceLight = Color(0xFFFFFFFF)
-val TextPrimary = Color(0xFF1C1C1E)
-val TextSecondary = Color(0xFF6E6E78)
-val CardLight = Color(0xFFFFF3E0)
-
-// ── Dark Theme ──
-val BackgroundDark = Color(0xFF1A1A2E)
-val SurfaceDark = Color(0xFF2D2D44)
-val CardDark = Color(0xFF363652)
-val TextOnDark = Color(0xFFE8E8F0)
-val TextSecondaryDark = Color(0xFF9E9EB0)
-
-// ── Functional ──
-val LiveRed = Color(0xFFFF3344)
-val GradientStart = NailongOrange
-val GradientEnd = NailongYellow
-val SuccessGreen = Color(0xFF4CAF50)
-val StarYellow = Color(0xFFFFB300)
+// Dark mode variants
+val NailongDarkBg = Color(0xFF1C1C1E)
+val NailongDarkCard = Color(0xFF2C2C2E)
+val NailongDarkSurface = Color(0xFF3A3A3C)
+val NailongDarkText = Color(0xFFF2F2F7)
+val NailongDarkSecondary = Color(0xFFAEAEB2)
