@@ -1,7 +1,5 @@
 package com.nailong.world.ui.game.match3
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,26 +8,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +43,7 @@ import com.nailong.world.viewmodel.Match3ViewModel
  *
  * Dark theme inspired by https://nylon-art-hub.base44.app
  * Uses 6 custom 奶龍 tile images as the game pieces.
+ * Renders the board using nested Row/Column for reliability.
  */
 
 private val DarkBackground = Color(0xFF12141C)
@@ -106,7 +99,6 @@ fun NailongMatch3Screen(
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.weight(1f))
-            // Placeholder for symmetry
             Box(modifier = Modifier.size(40.dp))
         }
 
@@ -129,7 +121,6 @@ fun NailongMatch3Screen(
                 board = state.board,
                 selectedTile = state.selectedTile,
                 onTileClick = { viewModel.onTileClick(it) },
-                modifier = Modifier.padding(horizontal = 12.dp),
             )
         }
 
@@ -210,35 +201,35 @@ private fun GameBoard(
     board: Array<Array<Tile>>,
     selectedTile: BoardPosition?,
     onTileClick: (BoardPosition) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    // Compose doesn't easily index with nested arrays in LazyVerticalGrid,
-    // so we flatten the board
-    val flatBoard = board.flatMapIndexed { row, rowArray ->
-        rowArray.mapIndexed { col, tile ->
-            Triple(row, col, tile)
-        }
-    }
+    // Calculate tile size based on screen width (accounting for padding)
+    // 8 columns, padding 12dp on each side, 3dp gaps = 8 * tile + 7 * 3
+    // With Box, we let it fillMaxWidth and use weight
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(BOARD_SIZE),
-        modifier = modifier
+    Column(
+        modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(1f),
-        horizontalArrangement = Arrangement.spacedBy(3.dp),
+            .padding(horizontal = 12.dp),
         verticalArrangement = Arrangement.spacedBy(3.dp),
-        userScrollEnabled = false,
     ) {
-        itemsIndexed(flatBoard) { _, (row, col, tile) ->
-            val pos = BoardPosition(row, col)
-            val isSelected = selectedTile == pos
+        for (row in 0 until BOARD_SIZE) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                for (col in 0 until BOARD_SIZE) {
+                    val pos = BoardPosition(row, col)
+                    val tile = if (row < board.size && col < board[row].size) board[row][col] else Tile.Empty
+                    val isSelected = selectedTile == pos
 
-            TileView(
-                tile = tile,
-                isSelected = isSelected,
-                onClick = { onTileClick(pos) },
-                modifier = Modifier.aspectRatio(1f),
-            )
+                    TileView(
+                        tile = tile,
+                        isSelected = isSelected,
+                        onClick = { onTileClick(pos) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
         }
     }
 }
@@ -256,23 +247,35 @@ private fun TileView(
         Modifier
     }
 
+    val tileBackground = if (tile.type in 0 until TILE_TYPES) DarkSurface else Color(0xFF1A1C28)
+
     Box(
         modifier = modifier
+            .aspectRatio(1f)
             .clip(RoundedCornerShape(6.dp))
-            .background(DarkSurface)
+            .background(tileBackground)
             .then(borderModifier)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         if (tile.type in 0 until TILE_TYPES) {
-            AsyncImage(
-                model = tileResources[tile.type],
-                contentDescription = "Tile ${tile.type}",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(2.dp),
-                contentScale = ContentScale.Fit,
-            )
+            val resId = tileResources[tile.type]
+            try {
+                androidx.compose.foundation.Image(
+                    painter = painterResource(id = resId),
+                    contentDescription = "Tile ${tile.type}",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(2.dp),
+                    contentScale = ContentScale.Fit,
+                )
+            } catch (e: Exception) {
+                // Fallback if image fails to load
+                Text(
+                    text = "🐉",
+                    fontSize = 18.sp,
+                )
+            }
         }
     }
 }
