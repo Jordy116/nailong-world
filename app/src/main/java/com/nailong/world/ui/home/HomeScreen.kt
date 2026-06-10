@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -31,8 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -151,28 +154,76 @@ private fun GalleryHeader() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(240.dp)
             .background(
                 Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
                 shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
-            )
-            .padding(top = 48.dp, bottom = 24.dp),
-        contentAlignment = Alignment.Center,
+            ),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "🐉", fontSize = 40.sp)
-            Spacer(modifier = Modifier.height(4.dp))
+        // ── 背景微光圓 ──
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(x = (-20).dp, y = (-40).dp)
+                .size(180.dp)
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(Color.White.copy(alpha = 0.08f)),
+        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset(x = 30.dp, y = (-10).dp)
+                .size(100.dp)
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(Color.White.copy(alpha = 0.06f)),
+        )
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = 30.dp)
+                .size(140.dp)
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(Color.White.copy(alpha = 0.05f)),
+        )
+
+        // ── 文字區（左側） ──
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 24.dp, top = 40.dp, bottom = 16.dp)
+                .fillMaxWidth(0.6f),
+        ) {
+            Text(
+                text = "🐉",
+                fontSize = 36.sp,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = "奶龍藝術館",
                 style = MaterialTheme.typography.displayLarge,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "NAILONG ART GALLERY",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                letterSpacing = 4.sp,
+                color = Color.White.copy(alpha = 0.8f),
+                letterSpacing = 3.sp,
             )
         }
+
+        // ── 右側：去背奶龍角色（破格效果） ──
+        androidx.compose.foundation.Image(
+            painter = painterResource(id = R.drawable.gallery_character),
+            contentDescription = "奶龍角色",
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .offset(x = 25.dp, y = 20.dp)
+                .width(180.dp)
+                .height(220.dp),
+            contentScale = ContentScale.Fit,
+        )
     }
 }
 
