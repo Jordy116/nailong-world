@@ -50,6 +50,7 @@ import com.nailong.world.ui.theme.GradientStart
 import com.nailong.world.ui.theme.NailongOrange
 import com.nailong.world.ui.theme.TextSecondary
 import com.nailong.world.viewmodel.HomeViewModel
+import com.nailong.world.R
 
 @Composable
 fun HomeScreen(
