@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,7 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.nailong.world.R
 import com.nailong.world.viewmodel.Match3ViewModel
 
@@ -260,22 +260,14 @@ private fun TileView(
     ) {
         if (tile.type in 0 until TILE_TYPES) {
             val resId = tileResources[tile.type]
-            try {
-                androidx.compose.foundation.Image(
-                    painter = painterResource(id = resId),
-                    contentDescription = "Tile ${tile.type}",
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(2.dp),
-                    contentScale = ContentScale.Fit,
-                )
-            } catch (e: Exception) {
-                // Fallback if image fails to load
-                Text(
-                    text = "🐉",
-                    fontSize = 18.sp,
-                )
-            }
+            androidx.compose.foundation.Image(
+                painter = painterResource(id = resId),
+                contentDescription = "Tile ${tile.type}",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(2.dp),
+                contentScale = ContentScale.Fit,
+            )
         }
     }
 }
