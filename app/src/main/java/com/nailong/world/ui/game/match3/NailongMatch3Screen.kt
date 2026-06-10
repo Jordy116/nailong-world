@@ -1,10 +1,8 @@
 package com.nailong.world.ui.game.match3
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,7 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,13 +38,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nailong.world.R
 import com.nailong.world.viewmodel.Match3ViewModel
-
-/**
- * 奶龍消消樂 (Nailong Match-3) Game Screen
- *
- * Dark theme inspired by https://nylon-art-hub.base44.app
- * Uses 6 custom 奶龍 tile images as game pieces.
- */
 
 private val DarkBackground = Color(0xFF12141C)
 private val DarkCard = Color(0xFF1E2030)
@@ -62,6 +55,9 @@ private val tileResources = listOf(
     R.drawable.tile_nailong_5,
     R.drawable.tile_nailong_6,
 )
+
+/** Minimum drag distance in dp to trigger a swap */
+private const val SWIPE_THRESHOLD_DP = 15f
 
 @Composable
 fun NailongMatch3Screen(
@@ -98,7 +94,6 @@ fun NailongMatch3Screen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Score display
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -109,7 +104,6 @@ fun NailongMatch3Screen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Game Board or Game Over
         if (state.isGameOver) {
             GameOverOverlay(state.score, { viewModel.resetGame() }, onBack)
         } else {
@@ -117,12 +111,12 @@ fun NailongMatch3Screen(
                 board = state.board,
                 selectedTile = state.selectedTile,
                 onTileClick = { viewModel.onTileClick(it) },
+                onSwipe = { from, to -> viewModel.onSwipe(from, to) },
             )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Action buttons
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(
                 onClick = { viewModel.resetGame() },
@@ -157,12 +151,18 @@ private fun StatCard(label: String, value: String) {
     }
 }
 
+/**
+ * Track tile dimensions at runtime so drag gestures can resolve board positions.
+ */
 @Composable
 private fun GameBoard(
     board: List<List<Tile>>,
     selectedTile: BoardPosition?,
     onTileClick: (BoardPosition) -> Unit,
+    onSwipe: (BoardPosition, BoardPosition) -> Unit,
 ) {
+    val density = LocalDensity.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -179,6 +179,7 @@ private fun GameBoard(
                     val tile = if (row < board.size && col < board[row].size) board[row][col] else Tile(-1)
                     val isSelected = selectedTile == pos
 
+                    // Calculate swipe direction based on drag gesture
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -189,7 +190,42 @@ private fun GameBoard(
                                 if (isSelected) Modifier.border(2.dp, AccentOrange, RoundedCornerShape(6.dp))
                                 else Modifier
                             )
-                            .clickable(onClick = { onTileClick(pos) }),
+                            .pointerInput(pos) {
+                                detectDragGestures(
+                                    onDragStart = {
+                                        onTileClick(pos)
+                                    },
+                                    onDragEnd = {
+                                        // handled by onDrag
+                                    },
+                                    onDragCancel = {
+                                        // deselect handled by viewModel
+                                    },
+                                    onDrag = { change, dragAmount ->
+                                        change.consume()
+                                        val thresholdPx = with(density) { SWIPE_THRESHOLD_DP.dp.toPx() }
+                                        val dx = dragAmount.x
+                                        val dy = dragAmount.y
+
+                                        val targetRow = when {
+                                            dy < -thresholdPx -> pos.row - 1  // swipe up
+                                            dy > thresholdPx -> pos.row + 1  // swipe down
+                                            else -> pos.row
+                                        }
+                                        val targetCol = when {
+                                            dx < -thresholdPx -> pos.col - 1  // swipe left
+                                            dx > thresholdPx -> pos.col + 1  // swipe right
+                                            else -> pos.col
+                                        }
+
+                                        if (targetRow != pos.row || targetCol != pos.col) {
+                                            if (targetRow in 0 until BOARD_SIZE && targetCol in 0 until BOARD_SIZE) {
+                                                onSwipe(pos, BoardPosition(targetRow, targetCol))
+                                            }
+                                        }
+                                    },
+                                )
+                            },
                         contentAlignment = Alignment.Center,
                     ) {
                         if (tile.type in 0 until TILE_TYPES) {
@@ -198,9 +234,8 @@ private fun GameBoard(
                                 painter = painterResource(id = resId),
                                 contentDescription = "Tile ${tile.type}",
                                 modifier = Modifier
-                                    .fillMaxSize(0.88f)
-                                    .padding(1.dp),
-                                contentScale = ContentScale.Fit,
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop,
                             )
                         }
                     }
@@ -211,11 +246,7 @@ private fun GameBoard(
 }
 
 @Composable
-private fun GameOverOverlay(
-    score: Int,
-    onRestart: () -> Unit,
-    onBack: () -> Unit,
-) {
+private fun GameOverOverlay(score: Int, onRestart: () -> Unit, onBack: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(32.dp),
         shape = RoundedCornerShape(24.dp),

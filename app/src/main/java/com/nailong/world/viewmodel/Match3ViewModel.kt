@@ -54,13 +54,23 @@ class Match3ViewModel : ViewModel() {
         }
 
         // Attempt swap
-        val result = engine.trySwap(currentSelected, pos)
+        performSwap(currentSelected, pos)
+    }
+
+    /** Handle swipe gesture between two adjacent positions */
+    fun onSwipe(from: BoardPosition, to: BoardPosition) {
+        if (state.isAnimating || state.isGameOver) return
+        performSwap(from, to)
+    }
+
+    /** Common swap logic used by both tap and swipe */
+    private fun performSwap(pos1: BoardPosition, pos2: BoardPosition) {
+        val result = engine.trySwap(pos1, pos2)
         if (!result.validSwap) {
             state = state.copy(selectedTile = null)
             return
         }
 
-        // Valid swap — process cascade
         state = state.copy(selectedTile = null, isAnimating = true)
         engine.processFullCascade()
         updateState()
