@@ -30,7 +30,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +39,7 @@ import com.nailong.world.ui.components.Badge
 import com.nailong.world.ui.components.ContentCard
 import com.nailong.world.ui.components.GameCard
 import com.nailong.world.ui.components.LiveChip
+import com.nailong.world.ui.components.NailongLiveBanner
 import com.nailong.world.ui.components.SectionHeader
 import com.nailong.world.ui.theme.GradientEnd
 import com.nailong.world.ui.theme.GradientStart
@@ -76,11 +76,11 @@ fun HomeScreen(
             GalleryHeader()
         }
 
-        // ── Live Room Card ──
+        // ── Live Room Banner ──
         item {
-            LiveRoomCard(
-                viewerCount = state.liveInfo.viewerCount,
-                onEnter = { /* navigate to live room */ },
+            Spacer(modifier = Modifier.height(8.dp))
+            NailongLiveBanner(
+                onClick = { /* navigate to live room */ },
             )
         }
 
@@ -176,66 +176,6 @@ private fun GalleryHeader() {
 }
 
 @Composable
-private fun LiveRoomCard(
-    viewerCount: Int,
-    onEnter: () -> Unit,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // Avatar / Icon
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.horizontalGradient(listOf(GradientStart, GradientEnd)),
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(text = "🐉", fontSize = 32.sp)
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "奶龍直播間",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    LiveChip()
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Live Now  ·  $viewerCount 人觀看",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
-                )
-            }
-            Button(
-                onClick = onEnter,
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = NailongOrange,
-                ),
-            ) {
-                Text("進入直播間", fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-}
-
 @Composable
 private fun CheckInCard(
     consecutiveDays: Int,
