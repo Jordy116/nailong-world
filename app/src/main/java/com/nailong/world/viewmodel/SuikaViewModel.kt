@@ -47,7 +47,7 @@ class SuikaViewModel : ViewModel() {
     }
 
     fun startGame() {
-        engine.setHighScore(LevelProgress.getHighScore(-2))  // -2 = suika game
+        engine.loadHighScore(LevelProgress.getHighScore(-2))  // -2 = suika game
         engine.initGame()
         updateState()
         // Start game loop

@@ -127,7 +127,7 @@ class SuikaGameEngine {
         dropX = SuikaContainer.WIDTH / 2f
     }
 
-    fun setHighScore(hs: Int) { highScore = hs }
+    fun loadHighScore(hs: Int) { highScore = hs }
 
     /** Spawn a random dragon (level 1-3) for the NEXT slot */
     fun spawnNext() {
