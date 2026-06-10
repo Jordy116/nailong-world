@@ -50,10 +50,8 @@ dependencies {
     // Material Components (for Compose theme)
     implementation("com.google.android.material:material:1.12.0")
 
-    // Miuix — HyperOS-inspired UI library (v0.9.1 for lower SDK compat)
+    // Miuix — HyperOS-inspired UI library
     implementation("top.yukonga.miuix.kmp:miuix-ui:0.9.1")
-    implementation("top.yukonga.miuix.kmp:miuix-blur:0.9.1")
-    implementation("top.yukonga.miuix.kmp:miuix-squircle:0.9.1")
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
