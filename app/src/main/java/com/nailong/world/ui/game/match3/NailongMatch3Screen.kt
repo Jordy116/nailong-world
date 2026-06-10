@@ -230,11 +230,11 @@ private fun ScoreCard(label: String, value: String, color: Color, modifier: Modi
 // ── Combo Popup ──
 @Composable
 private fun ComboPopup(text: String) {
-    var visible by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
-    androidx.compose.runtime.LaunchedEffect(text) { visible = true }
-    val scale by animateFloatAsState(if (visible) 1f else 0.3f, tween(200), label = "s")
-    val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(300), label = "a")
-    if (visible) {
+    val visibleState = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(text) { visibleState.value = true }
+    val isVisible = visibleState.value
+    val scale by animateFloatAsState(if (isVisible) 1f else 0.3f, tween(200), label = "s")
+    if (isVisible) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Box(
                 modifier = Modifier
@@ -249,7 +249,7 @@ private fun ComboPopup(text: String) {
             }
         }
     }
-    androidx.compose.runtime.LaunchedEffect(text) { kotlinx.coroutines.delay(500); visible = false }
+    androidx.compose.runtime.LaunchedEffect(text) { kotlinx.coroutines.delay(500); visibleState.value = false }
 }
 
 // ── Game Board 7x10 ──
