@@ -16,8 +16,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -41,9 +39,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nailong.world.ui.components.Badge
 import com.nailong.world.ui.components.ContentCard
-import com.nailong.world.ui.components.GameCard
 import com.nailong.world.ui.components.LiveChip
 import com.nailong.world.ui.components.NailongLiveBanner
+import com.nailong.world.ui.components.NailongMatch3Banner
 import com.nailong.world.ui.components.SectionHeader
 import com.nailong.world.ui.theme.GradientEnd
 import com.nailong.world.ui.theme.GradientStart
@@ -89,29 +87,13 @@ fun HomeScreen(
             )
         }
 
-        // ── Hot Games ──
+        // ── Match-3 Banner ──
         item {
-            SectionHeader(
-                title = "熱門遊戲",
-                actionLabel = "全部 →",
-                onAction = onNavigateToGame,
+            Spacer(modifier = Modifier.height(8.dp))
+            NailongMatch3Banner(
+                onClick = onPlayMatch3,
             )
         }
-        item {
-            LazyRow(
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                items(state.hotGames) { game ->
-                    GameCard(
-                        title = game.title,
-                        description = game.description,
-                        onClick = {
-                            if (game.id == "game_1") onPlayMatch3()
-                        },
-                    )
-                }
-            }
         }
 
         // ── Recommended Content ──
