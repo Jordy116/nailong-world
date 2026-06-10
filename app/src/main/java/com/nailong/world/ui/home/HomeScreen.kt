@@ -177,7 +177,6 @@ private fun GalleryHeader() {
 }
 
 @Composable
-@Composable
 private fun CheckInCard(
     consecutiveDays: Int,
     hasCheckedIn: Boolean,
