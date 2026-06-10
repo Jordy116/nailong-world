@@ -76,10 +76,10 @@ class NailongRepository {
         simulateDelay()
         return listOf(
             GameItem(id = "g1", title = "奶龍消消樂", description = "三消連線消除", category = "hot"),
-            GameItem(id = "g2", title = "奶龍跑酷", description = "跑酷收集", category = "hot"),
-            GameItem(id = "g3", title = "奶龍拼圖", description = "經典拼圖", category = "recommended"),
-            GameItem(id = "g4", title = "奶龍跳一跳", description = "益智跳躍", category = "recommended"),
-            GameItem(id = "g5", title = "奶龍釣魚", description = "休閒釣魚", category = "new"),
+            GameItem(id = "g_memory", title = "奶龍記憶翻牌", description = "經典記憶配對", category = "hot"),
+            GameItem(id = "g3", title = "奶龍跑酷", description = "跑酷收集", category = "recommended"),
+            GameItem(id = "g4", title = "奶龍拼圖", description = "經典拼圖", category = "recommended"),
+            GameItem(id = "g5", title = "奶龍跳一跳", description = "益智跳躍", category = "new"),
             GameItem(id = "g6", title = "奶龍廚房", description = "模擬烹飪", category = "new"),
         )
     }

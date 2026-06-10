@@ -34,6 +34,7 @@ import com.nailong.world.viewmodel.GameViewModel
 @Composable
 fun GameScreen(
     onPlayMatch3: () -> Unit = {},
+    onPlayMemory: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = viewModel(),
 ) {
@@ -86,7 +87,10 @@ fun GameScreen(
                 title = game.title,
                 description = game.description,
                 onClick = {
-                    if (game.id == "g1" || game.id == "game_1") onPlayMatch3()
+                    when (game.id) {
+                        "g1", "game_1" -> onPlayMatch3()
+                        "g_memory" -> onPlayMemory()
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
             )

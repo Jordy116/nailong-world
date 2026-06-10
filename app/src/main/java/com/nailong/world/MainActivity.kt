@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nailong.world.ui.community.CommunityScreen
 import com.nailong.world.ui.game.GameScreen
+import com.nailong.world.ui.game.memory.NailongMemoryScreen
 import com.nailong.world.ui.game.match3.ModeSelectScreen
 import com.nailong.world.ui.game.match3.NailongMatch3Screen
 import com.nailong.world.ui.game.match3.model.GameConfig
@@ -126,6 +127,9 @@ fun NailongWorldApp() {
                     onPlayMatch3 = {
                         navController.navigate("match3-menu")
                     },
+                    onPlayMemory = {
+                        navController.navigate("memory-game")
+                    },
                 )
             }
             composable("community") {
@@ -145,6 +149,11 @@ fun NailongWorldApp() {
             }
             composable("match3-game") {
                 NailongMatch3Screen(
+                    onBack = { navController.popBackStack() },
+                )
+            }
+            composable("memory-game") {
+                NailongMemoryScreen(
                     onBack = { navController.popBackStack() },
                 )
             }

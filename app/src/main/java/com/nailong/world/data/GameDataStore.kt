@@ -71,6 +71,20 @@ class GameDataStore(context: Context) {
     fun getHighestLevelUnlocked(): Int =
         prefs.getInt(KEY_HIGHEST_LEVEL, 4)
 
+    // ── Memory Game Best Records ──
+    fun getMemoryBestTime(): Int = prefs.getInt("memory_best_time", 999)
+    fun getMemoryBestMoves(): Int = prefs.getInt("memory_best_moves", 999)
+
+    fun saveMemoryGame(moves: Int, seconds: Int) {
+        with(prefs.edit()) {
+            val currTime = getMemoryBestTime()
+            val currMoves = getMemoryBestMoves()
+            if (seconds < currTime) putInt("memory_best_time", seconds)
+            if (moves < currMoves) putInt("memory_best_moves", moves)
+            apply()
+        }
+    }
+
     // ── Nickname ──
     fun getNickname(): String = prefs.getString(KEY_NICKNAME, "奶龍守護者_9527") ?: "奶龍守護者_9527"
 
