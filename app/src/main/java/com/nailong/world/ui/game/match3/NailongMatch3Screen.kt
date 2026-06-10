@@ -1,5 +1,7 @@
 package com.nailong.world.ui.game.match3
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,8 +43,7 @@ import com.nailong.world.viewmodel.Match3ViewModel
  * 奶龍消消樂 (Nailong Match-3) Game Screen
  *
  * Dark theme inspired by https://nylon-art-hub.base44.app
- * Uses 6 custom 奶龍 tile images as the game pieces.
- * Renders the board using nested Row/Column for reliability.
+ * Uses 6 custom 奶龍 tile images as game pieces.
  */
 
 private val DarkBackground = Color(0xFF12141C)
@@ -54,7 +54,6 @@ private val AccentYellow = Color(0xFFFFC107)
 private val TextPrimary = Color(0xFFEEE8E4)
 private val TextSecondary = Color(0xFF9A9490)
 
-// Resource IDs for the 6 tile drawables
 private val tileResources = listOf(
     R.drawable.tile_nailong_1,
     R.drawable.tile_nailong_2,
@@ -78,25 +77,20 @@ fun NailongMatch3Screen(
             .padding(top = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // ── Top Bar ──
+        // Top Bar
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "← 返回",
-                color = AccentOrange,
-                fontSize = 14.sp,
+                text = "← 返回", color = AccentOrange, fontSize = 14.sp,
                 modifier = Modifier.clickable(onClick = onBack),
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 text = "🐉 奶龍消消樂",
                 style = MaterialTheme.typography.titleLarge,
-                color = TextPrimary,
-                fontWeight = FontWeight.Bold,
+                color = TextPrimary, fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.weight(1f))
             Box(modifier = Modifier.size(40.dp))
@@ -104,18 +98,20 @@ fun NailongMatch3Screen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // ── Score & Moves ──
-        ScoreBoard(score = state.score, movesLeft = state.movesLeft)
+        // Score display
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            StatCard("🏆 分數", "${state.score}")
+            StatCard("👟 步數", "${state.movesLeft}")
+        }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ── Game Board ──
+        // Game Board or Game Over
         if (state.isGameOver) {
-            GameOverOverlay(
-                score = state.score,
-                onRestart = { viewModel.resetGame() },
-                onBack = onBack,
-            )
+            GameOverOverlay(state.score, { viewModel.resetGame() }, onBack)
         } else {
             GameBoard(
                 board = state.board,
@@ -126,44 +122,20 @@ fun NailongMatch3Screen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ── Action Buttons ──
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
+        // Action buttons
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(
                 onClick = { viewModel.resetGame() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DarkSurface,
-                    contentColor = TextPrimary,
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = DarkSurface, contentColor = TextPrimary),
                 shape = RoundedCornerShape(12.dp),
-            ) {
-                Text("🔄 重開", fontWeight = FontWeight.SemiBold)
-            }
+            ) { Text("🔄 重開", fontWeight = FontWeight.SemiBold) }
             Button(
                 onClick = { viewModel.shuffleBoard() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = DarkSurface,
-                    contentColor = TextPrimary,
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = DarkSurface, contentColor = TextPrimary),
                 shape = RoundedCornerShape(12.dp),
-            ) {
-                Text("🔀 洗牌", fontWeight = FontWeight.SemiBold)
-            }
+            ) { Text("🔀 洗牌", fontWeight = FontWeight.SemiBold) }
         }
-    }
-}
-
-@Composable
-private fun ScoreBoard(score: Int, movesLeft: Int) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-    ) {
-        StatCard(label = "🏆 分數", value = "$score")
-        StatCard(label = "👟 步數", value = "$movesLeft")
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -175,37 +147,22 @@ private fun StatCard(label: String, value: String) {
         colors = CardDefaults.cardColors(containerColor = DarkCard),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(
-                text = label,
-                color = TextSecondary,
-                fontSize = 12.sp,
-            )
+            Text(text = label, color = TextSecondary, fontSize = 12.sp)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = value,
-                color = AccentYellow,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-            )
+            Text(text = value, color = AccentYellow, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
 private fun GameBoard(
-    board: Array<Array<Tile>>,
+    board: List<List<Tile>>,
     selectedTile: BoardPosition?,
     onTileClick: (BoardPosition) -> Unit,
 ) {
-    // Calculate tile size based on screen width (accounting for padding)
-    // 8 columns, padding 12dp on each side, 3dp gaps = 8 * tile + 7 * 3
-    // With Box, we let it fillMaxWidth and use weight
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,55 +176,36 @@ private fun GameBoard(
             ) {
                 for (col in 0 until BOARD_SIZE) {
                     val pos = BoardPosition(row, col)
-                    val tile = if (row < board.size && col < board[row].size) board[row][col] else Tile.Empty
+                    val tile = if (row < board.size && col < board[row].size) board[row][col] else Tile(-1)
                     val isSelected = selectedTile == pos
 
-                    TileView(
-                        tile = tile,
-                        isSelected = isSelected,
-                        onClick = { onTileClick(pos) },
-                        modifier = Modifier.weight(1f),
-                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (tile.type in 0 until TILE_TYPES) DarkSurface else Color(0xFF1A1C28))
+                            .then(
+                                if (isSelected) Modifier.border(2.dp, AccentOrange, RoundedCornerShape(6.dp))
+                                else Modifier
+                            )
+                            .clickable(onClick = { onTileClick(pos) }),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (tile.type in 0 until TILE_TYPES) {
+                            val resId = tileResources[tile.type]
+                            androidx.compose.foundation.Image(
+                                painter = painterResource(id = resId),
+                                contentDescription = "Tile ${tile.type}",
+                                modifier = Modifier
+                                    .fillMaxSize(0.88f)
+                                    .padding(1.dp),
+                                contentScale = ContentScale.Fit,
+                            )
+                        }
+                    }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun TileView(
-    tile: Tile,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val borderModifier = if (isSelected) {
-        Modifier.border(2.dp, AccentOrange, RoundedCornerShape(6.dp))
-    } else {
-        Modifier
-    }
-
-    val tileBackground = if (tile.type in 0 until TILE_TYPES) DarkSurface else Color(0xFF1A1C28)
-
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(6.dp))
-            .background(tileBackground)
-            .then(borderModifier)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (tile.type in 0 until TILE_TYPES) {
-            val resId = tileResources[tile.type]
-            androidx.compose.foundation.Image(
-                painter = painterResource(id = resId),
-                contentDescription = "Tile ${tile.type}",
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(2.dp),
-                contentScale = ContentScale.Fit,
-            )
         }
     }
 }
@@ -278,69 +216,33 @@ private fun GameOverOverlay(
     onRestart: () -> Unit,
     onBack: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(32.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkCard),
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = DarkCard),
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = "🎉",
-                    fontSize = 48.sp,
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = "遊戲結束！",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = TextPrimary,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "最終分數",
-                    color = TextSecondary,
-                    fontSize = 14.sp,
-                )
-                Text(
-                    text = "$score",
-                    color = AccentYellow,
-                    fontSize = 48.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(
-                        onClick = onRestart,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AccentOrange,
-                            contentColor = Color.White,
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                    ) {
-                        Text("🔄 再玩一次", fontWeight = FontWeight.Bold)
-                    }
-                    Button(
-                        onClick = onBack,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = DarkSurface,
-                            contentColor = TextPrimary,
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                    ) {
-                        Text("← 返回", fontWeight = FontWeight.SemiBold)
-                    }
-                }
+            Text(text = "🎉", fontSize = 48.sp)
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(text = "遊戲結束！", style = MaterialTheme.typography.titleLarge, color = TextPrimary, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "最終分數", color = TextSecondary, fontSize = 14.sp)
+            Text(text = "$score", color = AccentYellow, fontSize = 48.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(20.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Button(
+                    onClick = onRestart,
+                    colors = ButtonDefaults.buttonColors(containerColor = AccentOrange, contentColor = Color.White),
+                    shape = RoundedCornerShape(12.dp),
+                ) { Text("🔄 再玩一次", fontWeight = FontWeight.Bold) }
+                Button(
+                    onClick = onBack,
+                    colors = ButtonDefaults.buttonColors(containerColor = DarkSurface, contentColor = TextPrimary),
+                    shape = RoundedCornerShape(12.dp),
+                ) { Text("← 返回", fontWeight = FontWeight.SemiBold) }
             }
         }
     }
