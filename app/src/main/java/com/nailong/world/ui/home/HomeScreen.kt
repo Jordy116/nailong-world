@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,8 @@ import com.nailong.world.ui.components.ContentCard
 import com.nailong.world.ui.components.GameCard
 import com.nailong.world.ui.components.LiveChip
 import com.nailong.world.ui.components.SectionHeader
+import com.nailong.world.ui.theme.GradientEnd
+import com.nailong.world.ui.theme.GradientStart
 import com.nailong.world.ui.theme.NailongOrange
 import com.nailong.world.ui.theme.TextSecondary
 import com.nailong.world.viewmodel.HomeViewModel
