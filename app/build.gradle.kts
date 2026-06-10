@@ -28,7 +28,6 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
         }
     }
@@ -52,6 +51,9 @@ android {
 }
 
 dependencies {
+    // Material Components (for Compose theme)
+    implementation("com.google.android.material:material:1.11.0")
+
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.01.00")
     implementation(composeBom)
