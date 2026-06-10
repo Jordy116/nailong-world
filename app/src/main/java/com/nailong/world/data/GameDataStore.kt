@@ -71,6 +71,13 @@ class GameDataStore(context: Context) {
     fun getHighestLevelUnlocked(): Int =
         prefs.getInt(KEY_HIGHEST_LEVEL, 4)
 
+    // ── Suika Game Best Record ──
+    fun getSuikaHighScore(): Int = prefs.getInt("suika_high_score", 0)
+    fun saveSuikaHighScore(score: Int) {
+        val current = getSuikaHighScore()
+        if (score > current) prefs.edit().putInt("suika_high_score", score).apply()
+    }
+
     // ── Memory Game Best Records ──
     fun getMemoryBestTime(): Int = prefs.getInt("memory_best_time", 999)
     fun getMemoryBestMoves(): Int = prefs.getInt("memory_best_moves", 999)

@@ -41,6 +41,7 @@ import com.nailong.world.viewmodel.GameViewModel
 private val gameEmojis = mapOf(
     "g1" to "🍭",        // 奶龍消消樂
     "g_memory" to "🃏",  // 奶龍記憶翻牌
+    "g_suika" to "🍉",   // 合成大奶龍
     "g3" to "🏃",        // 奶龍跑酷
     "g4" to "🧩",        // 奶龍拼圖
     "g5" to "🐟",        // 奶龍釣魚
@@ -51,6 +52,7 @@ private val gameEmojis = mapOf(
 fun GameScreen(
     onPlayMatch3: () -> Unit = {},
     onPlayMemory: () -> Unit = {},
+    onPlaySuika: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = viewModel(),
 ) {
@@ -125,6 +127,7 @@ fun GameScreen(
                         when (game.id) {
                             "g1", "game_1" -> onPlayMatch3()
                             "g_memory" -> onPlayMemory()
+                        "g_suika" -> onPlaySuika()
                         }
                     },
                 )

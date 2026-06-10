@@ -31,6 +31,7 @@ import com.nailong.world.ui.community.CommunityScreen
 import com.nailong.world.ui.game.GameScreen
 import com.nailong.world.ui.game.memory.NailongMemoryScreen
 import com.nailong.world.ui.game.match3.ModeSelectScreen
+import com.nailong.world.ui.game.suika.SuikaGameScreen
 import com.nailong.world.ui.game.match3.NailongMatch3Screen
 import com.nailong.world.ui.game.match3.model.GameConfig
 import com.nailong.world.ui.game.match3.model.GameMode
@@ -123,6 +124,7 @@ fun NailongWorldApp() {
                 GameScreen(
                     onPlayMatch3 = { navController.navigate("match3-menu") },
                     onPlayMemory = { navController.navigate("memory-game") },
+                    onPlaySuika = { navController.navigate("suika-game") },
                 )
             }
             composable("community") { CommunityScreen() }
@@ -141,6 +143,9 @@ fun NailongWorldApp() {
             }
             composable("memory-game") {
                 NailongMemoryScreen(onBack = { navController.popBackStack() })
+            }
+            composable("suika-game") {
+                SuikaGameScreen(onBack = { navController.popBackStack() })
             }
         }
     }

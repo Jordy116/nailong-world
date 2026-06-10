@@ -53,12 +53,14 @@ object LevelProgress {
 
     fun getHighScore(levelId: Int): Int = when (levelId) {
         -1 -> requireStore().getInfiniteHighScore()
+        -2 -> requireStore().getSuikaHighScore()
         else -> requireStore().getLevelHighScore(levelId)
     }
 
     fun saveHighScore(levelId: Int, score: Int) {
         when (levelId) {
             -1 -> requireStore().saveInfiniteHighScore(score)
+            -2 -> requireStore().saveSuikaHighScore(score)
             else -> requireStore().saveLevelHighScore(levelId, score)
         }
     }
