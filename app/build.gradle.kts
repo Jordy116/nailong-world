@@ -46,19 +46,11 @@ android {
     }
 }
 
-// Bypass AAR metadata compatibility checks (Miuix requires API 37)
-tasks.configureEach {
-    if (name.startsWith("check") && name.endsWith("AarMetadata")) {
-        enabled = false
-    }
-}
+// AAR metadata checks removed — no third-party libs that need bypass
 
 dependencies {
     // Material Components (for Compose theme)
     implementation("com.google.android.material:material:1.12.0")
-
-    // Miuix — HyperOS-inspired UI library
-    implementation("top.yukonga.miuix.kmp:miuix-ui:0.9.1")
 
     // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
