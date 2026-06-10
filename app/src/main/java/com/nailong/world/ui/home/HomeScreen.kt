@@ -50,6 +50,7 @@ import com.nailong.world.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     onNavigateToGame: () -> Unit = {},
+    onPlayMatch3: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
 ) {
@@ -100,7 +101,9 @@ fun HomeScreen(
                     GameCard(
                         title = game.title,
                         description = game.description,
-                        onClick = { /* open game */ },
+                        onClick = {
+                            if (game.id == "game_1") onPlayMatch3()
+                        },
                     )
                 }
             }

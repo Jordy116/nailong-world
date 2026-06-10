@@ -20,8 +20,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.nailong.world.ui.community.CommunityScreen
 import com.nailong.world.ui.game.GameScreen
+import com.nailong.world.ui.game.match3.NailongMatch3Screen
 import com.nailong.world.ui.home.HomeScreen
 import com.nailong.world.ui.navigation.BottomNavItem
 import com.nailong.world.ui.profile.ProfileScreen
@@ -41,6 +46,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun NailongWorldApp() {
+    val navController = rememberNavController()
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val navItems = BottomNavItem.items
 
@@ -53,7 +59,17 @@ fun NailongWorldApp() {
                 navItems.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = selectedTab == index,
-                        onClick = { selectedTab = index },
+                        onClick = {
+                            selectedTab = index
+                            // Navigate using the navController route
+                            navController.navigate(item.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
                         icon = {
                             Icon(
                                 imageVector = if (selectedTab == index) item.selectedIcon else item.unselectedIcon,
@@ -73,20 +89,44 @@ fun NailongWorldApp() {
             }
         },
     ) { innerPadding ->
-        when (selectedTab) {
-            0 -> HomeScreen(
-                onNavigateToGame = { selectedTab = 1 },
-                modifier = Modifier.padding(innerPadding),
-            )
-            1 -> GameScreen(
-                modifier = Modifier.padding(innerPadding),
-            )
-            2 -> CommunityScreen(
-                modifier = Modifier.padding(innerPadding),
-            )
-            3 -> ProfileScreen(
-                modifier = Modifier.padding(innerPadding),
-            )
+        NavHost(
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(innerPadding),
+        ) {
+            composable("home") {
+                HomeScreen(
+                    onNavigateToGame = {
+                        selectedTab = 1
+                        navController.navigate("game") {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onPlayMatch3 = {
+                        navController.navigate("match3")
+                    },
+                )
+            }
+            composable("game") {
+                GameScreen(
+                    onPlayMatch3 = {
+                        navController.navigate("match3")
+                    },
+                )
+            }
+            composable("community") {
+                CommunityScreen()
+            }
+            composable("profile") {
+                ProfileScreen()
+            }
+            composable("match3") {
+                NailongMatch3Screen(
+                    onBack = { navController.popBackStack() },
+                )
+            }
         }
     }
 }

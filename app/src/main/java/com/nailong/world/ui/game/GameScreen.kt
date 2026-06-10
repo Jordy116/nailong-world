@@ -33,6 +33,7 @@ import com.nailong.world.viewmodel.GameViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(
+    onPlayMatch3: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: GameViewModel = viewModel(),
 ) {
@@ -84,7 +85,9 @@ fun GameScreen(
             GameCard(
                 title = game.title,
                 description = game.description,
-                onClick = { /* launch game */ },
+                onClick = {
+                    if (game.id == "g1" || game.id == "game_1") onPlayMatch3()
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
         }

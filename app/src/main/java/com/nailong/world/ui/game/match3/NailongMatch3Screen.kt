@@ -1,0 +1,352 @@
+package com.nailong.world.ui.game.match3
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.nailong.world.R
+import com.nailong.world.viewmodel.Match3ViewModel
+
+/**
+ * 奶龍消消樂 (Nailong Match-3) Game Screen
+ *
+ * Dark theme inspired by https://nylon-art-hub.base44.app
+ * Uses 6 custom 奶龍 tile images as the game pieces.
+ */
+
+private val DarkBackground = Color(0xFF12141C)
+private val DarkCard = Color(0xFF1E2030)
+private val DarkSurface = Color(0xFF2A2D3E)
+private val AccentOrange = Color(0xFFFF6B35)
+private val AccentYellow = Color(0xFFFFC107)
+private val TextPrimary = Color(0xFFEEE8E4)
+private val TextSecondary = Color(0xFF9A9490)
+
+// Resource IDs for the 6 tile drawables
+private val tileResources = listOf(
+    R.drawable.tile_nailong_1,
+    R.drawable.tile_nailong_2,
+    R.drawable.tile_nailong_3,
+    R.drawable.tile_nailong_4,
+    R.drawable.tile_nailong_5,
+    R.drawable.tile_nailong_6,
+)
+
+@Composable
+fun NailongMatch3Screen(
+    onBack: () -> Unit = {},
+    viewModel: Match3ViewModel = viewModel(),
+) {
+    val state = viewModel.state
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DarkBackground)
+            .padding(top = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // ── Top Bar ──
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "← 返回",
+                color = AccentOrange,
+                fontSize = 14.sp,
+                modifier = Modifier.clickable(onClick = onBack),
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "🐉 奶龍消消樂",
+                style = MaterialTheme.typography.titleLarge,
+                color = TextPrimary,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // Placeholder for symmetry
+            Box(modifier = Modifier.size(40.dp))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // ── Score & Moves ──
+        ScoreBoard(score = state.score, movesLeft = state.movesLeft)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // ── Game Board ──
+        if (state.isGameOver) {
+            GameOverOverlay(
+                score = state.score,
+                onRestart = { viewModel.resetGame() },
+                onBack = onBack,
+            )
+        } else {
+            GameBoard(
+                board = state.board,
+                selectedTile = state.selectedTile,
+                onTileClick = { viewModel.onTileClick(it) },
+                modifier = Modifier.padding(horizontal = 12.dp),
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // ── Action Buttons ──
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Button(
+                onClick = { viewModel.resetGame() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DarkSurface,
+                    contentColor = TextPrimary,
+                ),
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                Text("🔄 重開", fontWeight = FontWeight.SemiBold)
+            }
+            Button(
+                onClick = { viewModel.shuffleBoard() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = DarkSurface,
+                    contentColor = TextPrimary,
+                ),
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                Text("🔀 洗牌", fontWeight = FontWeight.SemiBold)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScoreBoard(score: Int, movesLeft: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+    ) {
+        StatCard(label = "🏆 分數", value = "$score")
+        StatCard(label = "👟 步數", value = "$movesLeft")
+    }
+}
+
+@Composable
+private fun StatCard(label: String, value: String) {
+    Card(
+        modifier = Modifier.width(140.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkCard),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = label,
+                color = TextSecondary,
+                fontSize = 12.sp,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                color = AccentYellow,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
+@Composable
+private fun GameBoard(
+    board: Array<Array<Tile>>,
+    selectedTile: BoardPosition?,
+    onTileClick: (BoardPosition) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // Compose doesn't easily index with nested arrays in LazyVerticalGrid,
+    // so we flatten the board
+    val flatBoard = board.flatMapIndexed { row, rowArray ->
+        rowArray.mapIndexed { col, tile ->
+            Triple(row, col, tile)
+        }
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(BOARD_SIZE),
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1f),
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+        userScrollEnabled = false,
+    ) {
+        itemsIndexed(flatBoard) { _, (row, col, tile) ->
+            val pos = BoardPosition(row, col)
+            val isSelected = selectedTile == pos
+
+            TileView(
+                tile = tile,
+                isSelected = isSelected,
+                onClick = { onTileClick(pos) },
+                modifier = Modifier.aspectRatio(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun TileView(
+    tile: Tile,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val borderModifier = if (isSelected) {
+        Modifier.border(2.dp, AccentOrange, RoundedCornerShape(6.dp))
+    } else {
+        Modifier
+    }
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(DarkSurface)
+            .then(borderModifier)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (tile.type in 0 until TILE_TYPES) {
+            AsyncImage(
+                model = tileResources[tile.type],
+                contentDescription = "Tile ${tile.type}",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(2.dp),
+                contentScale = ContentScale.Fit,
+            )
+        }
+    }
+}
+
+@Composable
+private fun GameOverOverlay(
+    score: Int,
+    onRestart: () -> Unit,
+    onBack: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = DarkCard),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "🎉",
+                    fontSize = 48.sp,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "遊戲結束！",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "最終分數",
+                    color = TextSecondary,
+                    fontSize = 14.sp,
+                )
+                Text(
+                    text = "$score",
+                    color = AccentYellow,
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = onRestart,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AccentOrange,
+                            contentColor = Color.White,
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text("🔄 再玩一次", fontWeight = FontWeight.Bold)
+                    }
+                    Button(
+                        onClick = onBack,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = DarkSurface,
+                            contentColor = TextPrimary,
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text("← 返回", fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        }
+    }
+}
