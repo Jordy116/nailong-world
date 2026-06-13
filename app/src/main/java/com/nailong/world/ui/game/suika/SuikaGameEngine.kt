@@ -3,7 +3,6 @@ package com.nailong.world.ui.game.suika
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -28,10 +27,14 @@ val dragonLevels = listOf(
 
 // ── Physics Constants ──
 private const val GRAVITY = 0.35f
-private const val WALL_RESTITUTION = 0.4f
-private const val DRAGON_RESTITUTION = 0.3f
-private const val FRICTION = 0.98f
-private const val OVERLAP_PENALTY = 0.8f
+private const val WALL_RESTITUTION = 0.35f
+private const val DRAGON_RESTITUTION = 0.2f
+private const val FRICTION = 0.985f
+private const val AIR_DRAG = 0.998f
+private const val MAX_FALL_SPEED = 14f
+private const val POSITION_CORRECTION_PERCENT = 0.72f
+private const val POSITION_SLOP = 0.5f
+private const val COLLISION_SOLVER_ITERATIONS = 3
 
 // ── Game Entities ──
 data class SuikaDragon(
@@ -185,90 +188,49 @@ class SuikaGameEngine {
     fun update() {
         if (isGameOver) return
 
-        // Physics step for each active dragon
+        // Integrate movement for each active dragon.
         for (d in dragons) {
             if (!d.isActive) continue
             if (d.mergeCooldown > 0) d.mergeCooldown--
 
-            // Gravity
-            d.vy += GRAVITY
-
-            // Velocity damping (friction)
+            d.vy = (d.vy + GRAVITY).coerceAtMost(MAX_FALL_SPEED)
             d.vx *= FRICTION
+            d.vy *= AIR_DRAG
 
-            // Update position
             d.x += d.vx
             d.y += d.vy
 
-            // Wall collisions (left & right)
-            if (d.x - d.radius < SuikaContainer.LEFT_WALL) {
-                d.x = SuikaContainer.LEFT_WALL + d.radius
-                d.vx = -d.vx * WALL_RESTITUTION
-            }
-            if (d.x + d.radius > SuikaContainer.RIGHT_WALL) {
-                d.x = SuikaContainer.RIGHT_WALL - d.radius
-                d.vx = -d.vx * WALL_RESTITUTION
-            }
-            // Floor
-            if (d.y + d.radius > SuikaContainer.BOTTOM_WALL) {
-                d.y = SuikaContainer.BOTTOM_WALL - d.radius
-                d.vy = -d.vy * WALL_RESTITUTION
-            }
-            // Ceiling
-            if (d.y - d.radius < SuikaContainer.TOP_WALL) {
-                d.y = d.radius
-                d.vy = -d.vy * WALL_RESTITUTION
-            }
+            keepInsideContainer(d)
         }
 
-        // Dragon-to-dragon collision
-        for (i in dragons.indices) {
-            for (j in i + 1 until dragons.size) {
-                val a = dragons[i]
-                val b = dragons[j]
-                if (!a.isActive || !b.isActive) continue
+        // Multiple solver passes prevent large dragons from tunnelling / sticking
+        // when several bodies overlap in the same frame.
+        repeat(COLLISION_SOLVER_ITERATIONS) {
+            var mergedThisPass = false
 
-                val dx = b.x - a.x
-                val dy = b.y - a.y
-                val dist = sqrt(dx * dx + dy * dy)
-                val minDist = a.radius + b.radius
+            loop@ for (i in dragons.indices) {
+                for (j in i + 1 until dragons.size) {
+                    val a = dragons[i]
+                    val b = dragons[j]
+                    if (!a.isActive || !b.isActive) continue
 
-                if (dist < minDist && dist > 0.01f) {
-                    // Push apart
-                    val overlap = minDist - dist
-                    val nx = dx / dist
-                    val ny = dy / dist
-                    a.x -= nx * overlap * OVERLAP_PENALTY
-                    a.y -= ny * overlap * OVERLAP_PENALTY
-                    b.x += nx * overlap * OVERLAP_PENALTY
-                    b.y += ny * overlap * OVERLAP_PENALTY
-
-                    // Elastic collision response
-                    val relVx = b.vx - a.vx
-                    val relVy = b.vy - a.vy
-                    val relVn = relVx * nx + relVy * ny
-                    if (relVn < 0) {
-                        val impulse = -relVn * (1 + DRAGON_RESTITUTION)
-                        a.vx -= impulse * nx
-                        a.vy -= impulse * ny
-                        b.vx += impulse * nx
-                        b.vy += impulse * ny
-                    }
-
-                    // Check merge: same level and cooldown expired
-                    if (a.level == b.level && a.mergeCooldown <= 0 && b.mergeCooldown <= 0) {
-                        if (a.level < 6) {
-                            mergeDragons(i, j)
-                            break
-                        } else {
-                            // Level 6 + Level 6 = BIG BANG
-                            bigBang(i, j)
-                            break
+                    if (resolveDragonCollision(a, b)) {
+                        if (a.level == b.level && a.mergeCooldown <= 0 && b.mergeCooldown <= 0) {
+                            if (a.level < dragonLevels.size) {
+                                mergeDragons(i, j)
+                            } else {
+                                bigBang(i, j)
+                            }
+                            mergedThisPass = true
+                            break@loop
                         }
                     }
                 }
             }
-            if (i < dragons.size && !dragons[i].isActive) continue
+
+            dragons.removeAll { !it.isActive }
+            dragons.forEach { if (it.isActive) keepInsideContainer(it) }
+            if (mergedThisPass) return@repeat
         }
 
         // Remove inactive dragons
@@ -295,6 +257,74 @@ class SuikaGameEngine {
 
         // Danger zone check
         checkDangerZone()
+    }
+
+    private fun keepInsideContainer(d: SuikaDragon) {
+        if (d.x - d.radius < SuikaContainer.LEFT_WALL) {
+            d.x = SuikaContainer.LEFT_WALL + d.radius
+            if (d.vx < 0f) d.vx = -d.vx * WALL_RESTITUTION
+        }
+        if (d.x + d.radius > SuikaContainer.RIGHT_WALL) {
+            d.x = SuikaContainer.RIGHT_WALL - d.radius
+            if (d.vx > 0f) d.vx = -d.vx * WALL_RESTITUTION
+        }
+        if (d.y + d.radius > SuikaContainer.BOTTOM_WALL) {
+            d.y = SuikaContainer.BOTTOM_WALL - d.radius
+            if (d.vy > 0f) d.vy = -d.vy * WALL_RESTITUTION
+            if (abs(d.vy) < 0.25f) d.vy = 0f
+            if (abs(d.vx) < 0.03f) d.vx = 0f
+        }
+        if (d.y - d.radius < SuikaContainer.TOP_WALL) {
+            d.y = SuikaContainer.TOP_WALL + d.radius
+            if (d.vy < 0f) d.vy = -d.vy * WALL_RESTITUTION
+        }
+    }
+
+    /**
+     * Resolve circle collision and return true if the two dragons are touching.
+     * Handles exact-overlap cases deterministically so newly spawned / merged
+     * dragons cannot pass through or become permanently stuck together.
+     */
+    private fun resolveDragonCollision(a: SuikaDragon, b: SuikaDragon): Boolean {
+        var dx = b.x - a.x
+        var dy = b.y - a.y
+        var distSq = dx * dx + dy * dy
+        val minDist = a.radius + b.radius
+        val minDistSq = minDist * minDist
+
+        if (distSq >= minDistSq) return false
+
+        if (distSq < 0.0001f) {
+            // Pick a stable pseudo-random normal from ids when centers overlap.
+            val angle = ((a.id * 31 + b.id * 17) % 360) * Math.PI.toFloat() / 180f
+            dx = cos(angle)
+            dy = sin(angle)
+            distSq = 1f
+        }
+
+        val dist = sqrt(distSq)
+        val nx = dx / dist
+        val ny = dy / dist
+        val penetration = minDist - dist
+        val correction = max(penetration - POSITION_SLOP, 0f) * POSITION_CORRECTION_PERCENT / 2f
+
+        a.x -= nx * correction
+        a.y -= ny * correction
+        b.x += nx * correction
+        b.y += ny * correction
+
+        val relVx = b.vx - a.vx
+        val relVy = b.vy - a.vy
+        val relVn = relVx * nx + relVy * ny
+        if (relVn < 0f) {
+            val impulse = -(1f + DRAGON_RESTITUTION) * relVn / 2f
+            a.vx -= impulse * nx
+            a.vy -= impulse * ny
+            b.vx += impulse * nx
+            b.vy += impulse * ny
+        }
+
+        return true
     }
 
     private fun mergeDragons(i: Int, j: Int) {

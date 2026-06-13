@@ -167,9 +167,12 @@ fun SuikaGameScreen(
                     detectHorizontalDragGestures(
                         onDragEnd = { viewModel.dropDragon() },
                         onHorizontalDrag = { _, dragAmount ->
-                            val scale = if (containerSize.width > 0)
-                                SuikaContainer.WIDTH.toFloat() / containerSize.width else 1f
-                            viewModel.setDropX(viewModel.state.dropX + dragAmount * scale)
+                            val scaleX = if (containerSize.width > 0)
+                                containerSize.width.toFloat() / SuikaContainer.WIDTH else 1f
+                            val scaleY = if (containerSize.height > 0)
+                                containerSize.height.toFloat() / SuikaContainer.HEIGHT else 1f
+                            val scale = minOf(scaleX, scaleY).takeIf { it > 0f } ?: 1f
+                            viewModel.setDropX(viewModel.state.dropX + dragAmount / scale)
                         },
                     )
                 }
@@ -185,17 +188,25 @@ fun SuikaGameScreen(
             val offsetX = (screenW - SuikaContainer.WIDTH.toFloat() * scale) / 2f
             val offsetY = (screenH - SuikaContainer.HEIGHT.toFloat() * scale) / 2f
 
-            fun gx(x: Float) = (x * scale + offsetX).toInt()
-            fun gy(y: Float) = (y * scale + offsetY).toInt()
-            fun gr(r: Float) = (r * scale).dp
+            fun gx(x: Float) = x * scale + offsetX
+            fun gy(y: Float) = y * scale + offsetY
+            fun grPx(r: Float) = r * scale
+            fun grDp(r: Float) = with(density) { (r * scale).toDp() }
 
             // Danger line
             if (state.warningFlash) {
                 Box(
                     modifier = Modifier
-                        .offset { IntOffset(gx(SuikaContainer.LEFT_WALL + 4f), gy(SuikaContainer.DANGER_LINE)) }
+                        .offset {
+                            IntOffset(
+                                gx(SuikaContainer.LEFT_WALL + 4f).toInt(),
+                                gy(SuikaContainer.DANGER_LINE).toInt(),
+                            )
+                        }
                         .size(
-                            width = ((SuikaContainer.RIGHT_WALL - SuikaContainer.LEFT_WALL - 8f) * scale).dp,
+                            width = with(density) {
+                                ((SuikaContainer.RIGHT_WALL - SuikaContainer.LEFT_WALL - 8f) * scale).toDp()
+                            },
                             height = 2.dp,
                         )
                         .background(DangerRed),
@@ -205,9 +216,10 @@ fun SuikaGameScreen(
             // Dragons
             for (d in state.dragons) {
                 if (!d.isActive) continue
-                val px = gx(d.x) - gr(d.radius).value
-                val py = gy(d.y) - gr(d.radius).value
-                val size = gr(d.radius * 2)
+                val radiusPx = grPx(d.radius)
+                val px = gx(d.x) - radiusPx
+                val py = gy(d.y) - radiusPx
+                val size = grDp(d.radius * 2)
 
                 Box(
                     modifier = Modifier
@@ -236,8 +248,9 @@ fun SuikaGameScreen(
 
             // Current dragon preview
             state.currentDragon?.let { d ->
-                val previewSize = gr(d.radius * 1.4f)
-                val previewX = gx(state.dropX) - previewSize.value
+                val previewRadiusPx = grPx(d.radius * 0.7f)
+                val previewSize = grDp(d.radius * 1.4f)
+                val previewX = gx(state.dropX) - previewRadiusPx
                 val previewY = gy(SuikaContainer.DANGER_LINE + 10f)
 
                 Box(
