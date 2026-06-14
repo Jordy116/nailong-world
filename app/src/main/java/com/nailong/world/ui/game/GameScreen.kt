@@ -119,7 +119,11 @@ fun GameScreen(
                         (fadeOut(tween(160)) + slideOutVertically { -it / 12 })
                 },
                 label = "gameCategoryContent",
-            ) {
+            ) { targetCategory ->
+                val games = when (targetCategory) {
+                    "all" -> state.games
+                    else -> state.games.filter { game -> game.category == targetCategory }
+                }
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier
@@ -129,7 +133,7 @@ fun GameScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(viewModel.getFilteredGames(), key = { game -> game.id }) { game ->
+                    items(games, key = { game -> game.id }) { game ->
                         GameGridCard(
                             emoji = gameEmojis[game.id] ?: "🎯",
                             title = game.title,
