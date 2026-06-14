@@ -1,11 +1,13 @@
 package com.nailong.world.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -20,7 +22,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
@@ -32,15 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nailong.world.R
 
-/**
- * 奶龍消消樂 Full-width 大橫幅入口 Banner
- *
- * 設計語言與 NailongLiveBanner 家族化一致：
- * - 滿版長方形大卡片，16dp 圓角 + 陰影
- * - 深紫到橙黃潮流漸變背景
- * - 左側：去背奶龍角色 + 半透明漂浮方塊
- * - 右側：主標題 + 描述 + CTA 按鈕
- */
 @Composable
 fun NailongMatch3Banner(
     onClick: () -> Unit,
@@ -50,161 +42,128 @@ fun NailongMatch3Banner(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = RoundedCornerShape(28.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         onClick = onClick,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(160.dp)
+                .height(164.dp)
                 .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color(0xFF2D1B69),  // 深紫
-                            Color(0xFF6B2FA0),  // 紫
-                            Color(0xFFFF6B35),  // 橙
-                            Color(0xFFFFC107),  // 黃
+                    Brush.linearGradient(
+                        listOf(
+                            Color(0xFF3E1B85),
+                            Color(0xFF7B35D8),
+                            Color(0xFFFF6D42),
+                            Color(0xFFFFC82E),
                         ),
                     ),
-                    shape = RoundedCornerShape(20.dp),
+                    RoundedCornerShape(28.dp),
                 ),
         ) {
-            // ── 背景微光粒子 ──
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .offset(x = 40.dp, y = (-10).dp)
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.06f)),
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .offset(x = 80.dp, y = 10.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.05f)),
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = (-40).dp, y = 20.dp)
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.07f)),
-            )
+            SoftBubble(Alignment.TopStart, 34.dp, (-18).dp, 88.dp, 0.08f)
+            SoftBubble(Alignment.BottomEnd, 18.dp, 24.dp, 118.dp, 0.08f)
+            FloatingTile(Alignment.TopEnd, (-96).dp, 18.dp, 24.dp, 14f, Color(0xFFFFF1A6), 0.22f)
+            FloatingTile(Alignment.CenterEnd, (-120).dp, 6.dp, 20.dp, -12f, Color(0xFF6EE7B7), 0.18f)
+            FloatingTile(Alignment.BottomStart, 116.dp, (-18).dp, 22.dp, 18f, Color(0xFFFFFFFF), 0.14f)
 
-            // ── 迷你三消棋盤底紋（由半透明方塊構成） ──
-            // 漂浮方塊 1 — 左上
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .offset(x = 100.dp, y = 10.dp)
-                    .size(28.dp)
-                    .rotate(15f)
-                    .alpha(0.25f)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFF4CAF50).copy(alpha = 0.4f)),
-            )
-            // 漂浮方塊 2 — 中上
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .offset(x = 130.dp, y = 40.dp)
-                    .size(22.dp)
-                    .rotate(-10f)
-                    .alpha(0.2f)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFFE53935).copy(alpha = 0.35f)),
-            )
-            // 漂浮方塊 3 — 左中
+            // Left side readability veil.
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .offset(x = 110.dp)
-                    .size(24.dp)
-                    .rotate(25f)
-                    .alpha(0.2f)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFFFFC107).copy(alpha = 0.3f)),
-            )
-            // 漂浮方塊 4 — 左下
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .offset(x = 120.dp, y = (-10).dp)
-                    .size(20.dp)
-                    .rotate(-20f)
-                    .alpha(0.2f)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color(0xFF9C27B0).copy(alpha = 0.3f)),
+                    .fillMaxWidth(0.60f)
+                    .fillMaxHeight()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                Color.Black.copy(alpha = 0.18f),
+                                Color.Black.copy(alpha = 0.06f),
+                                Color.Transparent,
+                            ),
+                        ),
+                    ),
             )
 
-            // ── 左側：去背奶龍角色 ──
-            androidx.compose.foundation.Image(
-                painter = painterResource(id = R.drawable.match3_banner_char),
-                contentDescription = "奶龍消消樂角色",
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .offset(x = (-5).dp, y = 15.dp)
-                    .width(140.dp)
-                    .height(170.dp),
-                contentScale = ContentScale.Fit,
-            )
-
-            // ── 右側文字區 ──
             Column(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .fillMaxWidth(0.55f)
-                    .padding(end = 16.dp, top = 16.dp, bottom = 12.dp),
+                    .align(Alignment.CenterStart)
+                    .fillMaxWidth(0.57f)
+                    .padding(start = 20.dp, top = 18.dp, bottom = 18.dp),
             ) {
-                // 主標題
                 Text(
                     text = "奶龍消消樂",
                     color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    lineHeight = 28.sp,
+                    fontWeight = FontWeight.ExtraBold,
                 )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                // 遊戲簡介
+                Spacer(modifier = Modifier.height(7.dp))
                 Text(
                     text = "三消連線即消除，特殊方塊帶來連鎖爆擊！",
-                    color = Color.White.copy(alpha = 0.7f),
+                    color = Color.White.copy(alpha = 0.82f),
                     fontSize = 12.sp,
                     lineHeight = 17.sp,
+                    fontWeight = FontWeight.SemiBold,
                 )
-
                 Spacer(modifier = Modifier.weight(1f))
-
-                // CTA 按鈕
                 Row(
                     modifier = Modifier
-                        .align(Alignment.End)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFFFC107))
-                        .padding(horizontal = 16.dp, vertical = 9.dp),
+                        .clip(RoundedCornerShape(999.dp))
+                        .background(Color(0xFFFFD12E))
+                        .padding(horizontal = 17.dp, vertical = 9.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = "立即遊玩",
-                        color = Color(0xFF1C1C1E),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "→",
-                        color = Color(0xFF1C1C1E),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
+                    Text("立即遊玩", color = Color(0xFF241600), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.width(7.dp))
+                    Text("→", color = Color(0xFF241600), fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 }
             }
+
+            // Cleaner cutout with fewer white fringes than the previous thinking image.
+            Image(
+                painter = painterResource(id = R.drawable.nailong_cute_face),
+                contentDescription = "奶龍消消樂角色",
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 18.dp, y = 14.dp)
+                    .width(188.dp)
+                    .height(150.dp),
+                contentScale = ContentScale.Fit,
+            )
         }
     }
+}
+
+@Composable
+private fun BoxScope.SoftBubble(alignment: Alignment, x: androidx.compose.ui.unit.Dp, y: androidx.compose.ui.unit.Dp, size: androidx.compose.ui.unit.Dp, alpha: Float) {
+    Box(
+        modifier = Modifier
+            .align(alignment)
+            .offset(x = x, y = y)
+            .size(size)
+            .clip(CircleShape)
+            .background(Color.White.copy(alpha = alpha)),
+    )
+}
+
+@Composable
+private fun BoxScope.FloatingTile(
+    alignment: Alignment,
+    x: androidx.compose.ui.unit.Dp,
+    y: androidx.compose.ui.unit.Dp,
+    size: androidx.compose.ui.unit.Dp,
+    rotation: Float,
+    color: Color,
+    alpha: Float,
+) {
+    Box(
+        modifier = Modifier
+            .align(alignment)
+            .offset(x = x, y = y)
+            .size(size)
+            .rotate(rotation)
+            .clip(RoundedCornerShape(7.dp))
+            .background(color.copy(alpha = alpha)),
+    )
 }

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -166,7 +167,7 @@ fun ModernHeroHeader(
             .background(Brush.linearGradient(listOf(NailongPrimary, NailongSecondary, NailongGlow)))
             .padding(22.dp),
     ) {
-        Column(modifier = Modifier.fillMaxWidth(0.78f)) {
+        Column(modifier = Modifier.fillMaxWidth(if (imageRes != null) 0.66f else 0.78f)) {
             Text(eyebrow, color = Color.White.copy(alpha = 0.78f), style = MaterialTheme.typography.labelMedium)
             Text(title, color = Color.White, style = MaterialTheme.typography.displayLarge)
             Text(subtitle, color = Color.White.copy(alpha = 0.82f), style = MaterialTheme.typography.bodyMedium)
@@ -176,8 +177,9 @@ fun ModernHeroHeader(
                 painter = painterResource(id = imageRes),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(132.dp)
-                    .align(Alignment.CenterEnd),
+                    .size(146.dp)
+                    .align(Alignment.CenterEnd)
+                    .offset(x = 12.dp, y = 8.dp),
                 contentScale = ContentScale.Fit,
             )
         } else {
