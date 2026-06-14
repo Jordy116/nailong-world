@@ -1,5 +1,9 @@
 package com.nailong.world.ui.profile
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +62,7 @@ import com.nailong.world.ui.theme.NailongGlow
 import com.nailong.world.ui.theme.NailongMint
 import com.nailong.world.ui.theme.NailongPrimary
 import com.nailong.world.ui.theme.NailongSecondary
+import kotlinx.coroutines.delay
 
 @Composable
 fun ProfileScreen(modifier: Modifier = Modifier) {
@@ -67,6 +73,12 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 
     var showAboutDialog by remember { mutableStateOf(false) }
     var showLogoutConfirm by remember { mutableStateOf(false) }
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(80)
+        visible = true
+    }
 
     if (showAboutDialog) {
         AlertDialog(
@@ -100,21 +112,31 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
     ModernPageBackground(modifier = modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
-                ModernHeroHeader(
-                    eyebrow = stats.title,
-                    title = stats.nickname,
-                    subtitle = "Lv.${stats.playerLevel} · ${stats.expCurrent}/${stats.expMax} EXP",
-                    emoji = "🐲",
-                    imageRes = R.drawable.nailong_arms_crossed,
-                )
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(420)) + slideInVertically(tween(420)) { -it / 6 },
+                ) {
+                    ModernHeroHeader(
+                        eyebrow = stats.title,
+                        title = stats.nickname,
+                        subtitle = "Lv.${stats.playerLevel} · ${stats.expCurrent}/${stats.expMax} EXP",
+                        emoji = "🐲",
+                        imageRes = R.drawable.nailong_arms_crossed,
+                    )
+                }
             }
 
             item {
-                ProfileExpCard(
-                    expCurrent = stats.expCurrent,
-                    expMax = stats.expMax,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                )
+                AnimatedVisibility(
+                    visible = visible,
+                    enter = fadeIn(tween(500, delayMillis = 70)) + slideInVertically(tween(500, delayMillis = 70)) { it / 5 },
+                ) {
+                    ProfileExpCard(
+                        expCurrent = stats.expCurrent,
+                        expMax = stats.expMax,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
             }
 
             item {
