@@ -1,5 +1,6 @@
 package com.nailong.world.ui.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,10 +40,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nailong.world.R
 import com.nailong.world.ui.components.AnimatedBadge
 import com.nailong.world.ui.components.ModernHeroHeader
 import com.nailong.world.ui.components.ModernPageBackground
@@ -101,6 +105,7 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                     title = stats.nickname,
                     subtitle = "Lv.${stats.playerLevel} · ${stats.expCurrent}/${stats.expMax} EXP",
                     emoji = "🐲",
+                    imageRes = R.drawable.nailong_arms_crossed,
                 )
             }
 
@@ -120,9 +125,9 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    StatCard("🏆", "最高分", "${stats.infiniteHighScore}", Modifier.weight(1f))
-                    StatCard("🎯", "已通關", "$clearedCount 關", Modifier.weight(1f))
-                    StatCard("🔓", "解鎖", "第 ${stats.highestLevelUnlocked} 關", Modifier.weight(1f))
+                    StatCard(R.drawable.nailong_shout, "最高分", "${stats.infiniteHighScore}", Modifier.weight(1f))
+                    StatCard(R.drawable.nailong_cute_face, "已通關", "$clearedCount 關", Modifier.weight(1f))
+                    StatCard(R.drawable.nailong_wave, "解鎖", "第 ${stats.highestLevelUnlocked} 關", Modifier.weight(1f))
                 }
             }
 
@@ -197,7 +202,7 @@ private fun ProfileExpCard(expCurrent: Int, expMax: Int, modifier: Modifier = Mo
 }
 
 @Composable
-private fun StatCard(emoji: String, label: String, value: String, modifier: Modifier = Modifier) {
+private fun StatCard(imageRes: Int, label: String, value: String, modifier: Modifier = Modifier) {
     PressableScaleCard(onClick = { }, modifier = modifier) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -209,7 +214,14 @@ private fun StatCard(emoji: String, label: String, value: String, modifier: Modi
                     .clip(CircleShape)
                     .background(Brush.linearGradient(listOf(NailongPrimary.copy(alpha = 0.18f), NailongMint.copy(alpha = 0.18f)))),
                 contentAlignment = Alignment.Center,
-            ) { Text(emoji, fontSize = 20.sp) }
+            ) {
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(0.95f),
+                    contentScale = ContentScale.Fit,
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, maxLines = 1)
             Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

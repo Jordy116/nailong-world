@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,11 +41,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nailong.world.R
 import com.nailong.world.ui.components.ModernChip
 import com.nailong.world.ui.components.ModernHeroHeader
 import com.nailong.world.ui.components.ModernPageBackground
@@ -55,15 +59,15 @@ import com.nailong.world.ui.theme.NailongSecondary
 import com.nailong.world.viewmodel.GameViewModel
 import kotlinx.coroutines.delay
 
-private val gameEmojis = mapOf(
-    "g1" to "🍭",
-    "game_1" to "🍭",
-    "g_memory" to "🃏",
-    "g_suika" to "🐉",
-    "g3" to "🏃",
-    "g4" to "🧩",
-    "g5" to "🐟",
-    "g6" to "🍳",
+private val gameArt = mapOf(
+    "g1" to R.drawable.nailong_cute_face,
+    "game_1" to R.drawable.nailong_cute_face,
+    "g_memory" to R.drawable.nailong_thinking,
+    "g_suika" to R.drawable.nailong_cabbage,
+    "g3" to R.drawable.nailong_wave,
+    "g4" to R.drawable.nailong_arms_crossed,
+    "g5" to R.drawable.nailong_laugh_head,
+    "g6" to R.drawable.nailong_belly_laugh,
 )
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -94,6 +98,7 @@ fun GameScreen(
                     title = "遊戲中心",
                     subtitle = "挑戰分數、解鎖成就，讓奶龍陪你玩",
                     emoji = "🎮",
+                    imageRes = R.drawable.nailong_laugh_duo,
                 )
             }
 
@@ -135,7 +140,7 @@ fun GameScreen(
                 ) {
                     items(games, key = { game -> game.id }) { game ->
                         GameGridCard(
-                            emoji = gameEmojis[game.id] ?: "🎯",
+                            imageRes = gameArt[game.id] ?: R.drawable.nailong_simple,
                             title = game.title,
                             description = game.description,
                             enabled = game.id in setOf("g1", "game_1", "g_memory", "g_suika"),
@@ -156,7 +161,7 @@ fun GameScreen(
 
 @Composable
 private fun GameGridCard(
-    emoji: String,
+    imageRes: Int,
     title: String,
     description: String,
     enabled: Boolean,
@@ -197,7 +202,12 @@ private fun GameGridCard(
                         .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.55f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(text = emoji, fontSize = 44.sp)
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(0.88f),
+                        contentScale = ContentScale.Fit,
+                    )
                 }
             }
 

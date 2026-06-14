@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,7 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -152,6 +155,7 @@ fun ModernHeroHeader(
     subtitle: String,
     emoji: String,
     modifier: Modifier = Modifier,
+    imageRes: Int? = null,
 ) {
     Box(
         modifier = modifier
@@ -166,11 +170,22 @@ fun ModernHeroHeader(
             Text(title, color = Color.White, style = MaterialTheme.typography.displayLarge)
             Text(subtitle, color = Color.White.copy(alpha = 0.82f), style = MaterialTheme.typography.bodyMedium)
         }
-        Text(
-            text = emoji,
-            fontSize = 58.sp,
-            modifier = Modifier.align(Alignment.CenterEnd),
-        )
+        if (imageRes != null) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(132.dp)
+                    .align(Alignment.CenterEnd),
+                contentScale = ContentScale.Fit,
+            )
+        } else {
+            Text(
+                text = emoji,
+                fontSize = 58.sp,
+                modifier = Modifier.align(Alignment.CenterEnd),
+            )
+        }
     }
 }
 
@@ -235,6 +250,7 @@ fun ModernListCard(
     badge: String? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    imageRes: Int? = null,
 ) {
     PressableScaleCard(onClick = onClick, modifier = modifier.fillMaxWidth()) {
         Row(
@@ -249,7 +265,16 @@ fun ModernListCard(
                     .background(Brush.linearGradient(listOf(NailongPrimary.copy(alpha = 0.18f), NailongSecondary.copy(alpha = 0.22f)))),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(emoji, fontSize = 30.sp)
+                if (imageRes != null) {
+                    Image(
+                        painter = painterResource(id = imageRes),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(0.96f),
+                        contentScale = ContentScale.Fit,
+                    )
+                } else {
+                    Text(emoji, fontSize = 30.sp)
+                }
             }
             Column(modifier = Modifier.weight(1f)) {
                 if (badge != null) AnimatedBadge(badge)

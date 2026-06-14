@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nailong.world.R
 import com.nailong.world.ui.components.ModernHeroHeader
 import com.nailong.world.ui.components.ModernListCard
 import com.nailong.world.ui.components.ModernPageBackground
@@ -56,6 +57,7 @@ fun HomeScreen(
                         title = "奶龍世界",
                         subtitle = "更流暢、更可愛的遊戲與社區體驗",
                         emoji = "🐉",
+                        imageRes = R.drawable.nailong_wing_wave,
                     )
                 }
             }
@@ -93,11 +95,11 @@ fun HomeScreen(
                     visible = itemVisible,
                     enter = fadeIn(tween(360)) + slideInVertically(tween(360)) { it / 4 },
                 ) {
-                    val emoji = when (content.category) {
-                        "gallery" -> "🖼️"
-                        "music" -> "🎧"
-                        "sticker" -> "✨"
-                        else -> "🎯"
+                    val (emoji, imageRes) = when (content.category) {
+                        "gallery" -> "🖼️" to R.drawable.nailong_thinking
+                        "music" -> "🎧" to R.drawable.nailong_laugh_head
+                        "sticker" -> "✨" to R.drawable.nailong_cute_face
+                        else -> "🎯" to R.drawable.nailong_simple
                     }
                     ModernListCard(
                         emoji = emoji,
@@ -106,6 +108,7 @@ fun HomeScreen(
                         badge = content.badgeText,
                         onClick = { },
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                        imageRes = imageRes,
                     )
                 }
             }

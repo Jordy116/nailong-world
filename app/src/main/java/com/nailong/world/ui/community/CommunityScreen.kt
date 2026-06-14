@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,9 +33,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nailong.world.R
 import com.nailong.world.ui.components.AnimatedBadge
 import com.nailong.world.ui.components.ModernHeroHeader
 import com.nailong.world.ui.components.ModernPageBackground
@@ -64,6 +68,7 @@ fun CommunityScreen(modifier: Modifier = Modifier) {
                     title = "奶龍社區",
                     subtitle = "分享攻略、創作與每一個可愛瞬間",
                     emoji = "💬",
+                    imageRes = R.drawable.nailong_hug,
                 )
             }
             itemsIndexed(mockPosts) { index, post ->
@@ -107,7 +112,12 @@ private fun CommunityPostCard(post: CommunityPost, modifier: Modifier = Modifier
                         .background(Brush.linearGradient(listOf(NailongPrimary, NailongSecondary, NailongGlow))),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("🐉", fontSize = 22.sp)
+                    Image(
+                        painter = painterResource(id = R.drawable.nailong_simple),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(0.9f),
+                        contentScale = ContentScale.Fit,
+                    )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
